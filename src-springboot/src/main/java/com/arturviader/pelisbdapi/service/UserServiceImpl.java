@@ -1,6 +1,8 @@
 package com.arturviader.pelisbdapi.service;
 
 import com.arturviader.pelisbdapi.dto.*;
+import com.arturviader.pelisbdapi.exception.EmailNotConfirmed;
+import com.arturviader.pelisbdapi.exception.UserNotFound;
 import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.model.VerificationToken;
 import com.arturviader.pelisbdapi.repository.VerificationTokenRepository;
@@ -9,10 +11,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Service
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -48,7 +52,7 @@ public class UserServiceImpl implements UserService{
 
         verificationTokenRepository.save(verificationToken);
 
-        String link = "http://localhost:8080/auth/confirm?token=" + token;
+        String link = "http://localhost:3000/api/auth/confirmemail?token=" + token;
 
         emailService.send(
                 user.getEmail(),
@@ -61,6 +65,11 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public JwtResponse loginUser(LoginRequest dto) {
+        User user = userRepository.findByEmail(dto.email())
+                .orElseThrow(UserNotFound::new);
+        if (!user.isEnabled()) {
+            throw new EmailNotConfirmed();
+        }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         dto.email(),
@@ -69,8 +78,6 @@ public class UserServiceImpl implements UserService{
         );
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String jwt = jwtService.generateToken(userDetails);
-        User user = userRepository.findByEmail(dto.email())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         return new JwtResponse(
                 jwt,
                 "Bearer",

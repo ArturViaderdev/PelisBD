@@ -1,25 +1,44 @@
 import { create } from 'zustand';
 
-export const useAuthStore = create((set) => ({
-  user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
-  token: localStorage.getItem('token'),
-  isAuthenticated: !!localStorage.getItem('token'),
-  isLoading: false,
-  error: null,
-
-  setUser: (user, token) => {
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', token);
-    set({ user, token, isAuthenticated: true, error: null });
-  },
-
-  logout: () => {
+const getStoredUser = () => {
+  try {
+    const rawUser = localStorage.getItem('user');
+    return rawUser ? JSON.parse(rawUser) : null;
+  } catch {
     localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    set({ user: null, token: null, isAuthenticated: false });
-  },
+    return null;
+  }
+};
 
-  setLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
-  clearError: () => set({ error: null }),
-}));
+const getStoredToken = () => {
+  return localStorage.getItem('token') || null;
+};
+
+export const useAuthStore = create((set) => {
+  const user = getStoredUser();
+  const token = getStoredToken();
+
+  return {
+    user,
+    token,
+    isAuthenticated: !!token,
+    isLoading: false,
+    error: null,
+
+    setUser: (user, token) => {
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', token);
+      set({ user, token, isAuthenticated: true, error: null });
+    },
+
+    logout: () => {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      set({ user: null, token: null, isAuthenticated: false, error: null });
+    },
+
+    setLoading: (isLoading) => set({ isLoading }),
+                                   setError: (error) => set({ error }),
+                                   clearError: () => set({ error: null }),
+  };
+});

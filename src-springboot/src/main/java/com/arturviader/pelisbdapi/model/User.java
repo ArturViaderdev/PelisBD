@@ -3,13 +3,11 @@ package com.arturviader.pelisbdapi.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.data.annotation.Id;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 
 @Entity
 @Table(name="users",
         uniqueConstraints= {
-            @UniqueConstraint(columnNames="email"),
+                @UniqueConstraint(columnNames="email"),
                 @UniqueConstraint(columnNames = "user_name")
         })
 public class User {
@@ -80,3 +78,4 @@ public class User {
         this.enabled = enabled;
     }
 }
+
