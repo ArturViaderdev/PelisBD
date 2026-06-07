@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
-    @ExceptionHandler({AlreadyRegistreredEmail.class})
+    @ExceptionHandler({AlreadyRegistreredEmail.class, AlreadyRegistreredUserName.class})
     public ResponseEntity<ErrorResponse> conflict(RuntimeException ex, WebRequest request){
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
         ErrorResponse body = new ErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), path);

@@ -1,10 +1,13 @@
 package com.arturviader.pelisbdapi.service;
 
 import com.arturviader.pelisbdapi.dto.*;
+import com.arturviader.pelisbdapi.exception.AlreadyRegistreredEmail;
+import com.arturviader.pelisbdapi.exception.AlreadyRegistreredUserName;
 import com.arturviader.pelisbdapi.exception.EmailNotConfirmed;
 import com.arturviader.pelisbdapi.exception.UserNotFound;
 import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.model.VerificationToken;
+import com.arturviader.pelisbdapi.repository.UserRepository;
 import com.arturviader.pelisbdapi.repository.VerificationTokenRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,8 +40,12 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserResponse registerUser(NewUserRequest dto) {
         if (userRepository.existsByEmail(dto.email())) {
-            throw new IllegalArgumentException("Email ya registrado");
+            throw new AlreadyRegistreredEmail();
         }
+        if (userRepository.existsByUserName(dto.userName())){
+            throw new AlreadyRegistreredUserName();
+        }
+
         User user = UserMapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);

@@ -1,6 +1,7 @@
 package com.arturviader.pelisbdapi.service;
 
 import com.arturviader.pelisbdapi.model.User;
+import com.arturviader.pelisbdapi.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
