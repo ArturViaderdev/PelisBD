@@ -2,6 +2,8 @@ package com.arturviader.pelisbdapi;
 
 import com.arturviader.pelisbdapi.exception.AlreadyRegistreredEmail;
 import com.arturviader.pelisbdapi.exception.AlreadyRegistreredUserName;
+import com.arturviader.pelisbdapi.exception.EmailNotConfirmed;
+import com.arturviader.pelisbdapi.exception.UserNotFound;
 import com.arturviader.pelisbdapi.service.EmailServiceForTests;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -100,5 +102,87 @@ public class UserControllerTests {
                                 "}")).andExpect(status().isConflict())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException() instanceof AlreadyRegistreredUserName));
+    }
+
+    @Test
+    @Transactional
+    public void loginUserEmailNotConfirmedTest() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\n" +
+                                "  \"email\": \"sinconfirmar@mail.es\",\n" +
+                                "  \"userName\": \"Sinconfirmar\",\n" +
+                                "  \"password\": \"prova1234\"\n" +
+                                "}"))
+                .andExpect(status().isCreated());
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\n" +
+                                "  \"email\": \"sinconfirmar@mail.es\",\n" +
+                                "  \"password\": \"prova1234\"\n" +
+                                "}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException() instanceof EmailNotConfirmed));
+    }
+
+    @Test
+    @Transactional
+    public void loginUserNotFoundTest() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\n" +
+                                "  \"email\": \"noexiste@mail.es\",\n" +
+                                "  \"password\": \"prova1234\"\n" +
+                                "}"))
+                .andExpect(status().isNotFound())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException() instanceof UserNotFound));
+    }
+
+    @Test
+    @Transactional
+    public void loginUserBadCredentialsTest() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\n" +
+                                "  \"email\": \"juan@mail.es\",\n" +
+                                "  \"userName\": \"Juan\",\n" +
+                                "  \"password\": \"prova1234\"\n" +
+                                "}"))
+                .andExpect(status().isCreated());
+        String body = emailServiceForTests.getLastText();
+        String token = body.substring(body.indexOf("token=") + 6);
+        mockMvc.perform(get("/api/auth/confirmemail")
+                        .param("token", token))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\n" +
+                                "  \"email\": \"juan@mail.es\",\n" +
+                                "  \"password\": \"passwordmalo123\"\n" +
+                                "}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @Transactional
+    public void confirmEmailInvalidTokenTest() throws Exception {
+        mockMvc.perform(get("/api/auth/confirmemail")
+                        .param("token", "token-invalido"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
+    public void registerNewUserInvalidBodyTest() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\n" +
+                                "  \"email\": \"\",\n" +
+                                "  \"userName\": \"\",\n" +
+                                "  \"password\": \"\"\n" +
+                                "}"))
+                .andExpect(status().isBadRequest());
     }
 }

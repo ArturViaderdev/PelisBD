@@ -1,10 +1,7 @@
 package com.arturviader.pelisbdapi.service;
 
 import com.arturviader.pelisbdapi.dto.*;
-import com.arturviader.pelisbdapi.exception.AlreadyRegistreredEmail;
-import com.arturviader.pelisbdapi.exception.AlreadyRegistreredUserName;
-import com.arturviader.pelisbdapi.exception.EmailNotConfirmed;
-import com.arturviader.pelisbdapi.exception.UserNotFound;
+import com.arturviader.pelisbdapi.exception.*;
 import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.model.VerificationToken;
 import com.arturviader.pelisbdapi.repository.UserRepository;
@@ -98,10 +95,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public void confirmEmail(String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Token inválido"));
+                .orElseThrow(TokenNotFoundException::new);
 
         if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("Token caducado");
+            throw new TokenExpiredException();
         }
 
         User user = verificationToken.getUser();
