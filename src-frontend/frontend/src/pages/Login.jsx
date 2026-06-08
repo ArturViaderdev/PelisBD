@@ -21,7 +21,6 @@ export default function Login() {
       const response = await authService.login(email, password);
       const data = response.data;
 
-      // data = { token, type, id, email, userName, role }
       const user = {
         id: data.id,
         email: data.email,
@@ -29,12 +28,7 @@ export default function Login() {
         role: data.role,
       };
 
-      // Guarda en el store (y opcionalmente en localStorage dentro del store)
       setUser(user, data.token);
-
-      // Opcional: si quieres persistir aquí:
-      // localStorage.setItem('token', data.token);
-
       navigate('/');
     } catch (err) {
       setError(
@@ -48,18 +42,20 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-    <div className="card w-full max-w-md">
+    <div className="card w-full max-w-md text-black">
     <h2 className="text-3xl font-bold text-center mb-8">Iniciar Sesión</h2>
 
     {error && (
-      <div className="mb-4 p-4 bg-red-900 border border-red-700 rounded-lg text-red-200">
+      <div className="mb-4 p-4 bg-red-100 border border-red-300 rounded-lg text-red-800">
       {error}
       </div>
     )}
 
     <form onSubmit={handleSubmit} className="space-y-4">
     <div>
-    <label className="block text-sm font-semibold mb-2">Email</label>
+    <label className="block text-sm font-semibold mb-2 text-black">
+    Email
+    </label>
     <input
     type="email"
     value={email}
@@ -70,7 +66,9 @@ export default function Login() {
     </div>
 
     <div>
-    <label className="block text-sm font-semibold mb-2">Contraseña</label>
+    <label className="block text-sm font-semibold mb-2 text-black">
+    Contraseña
+    </label>
     <input
     type="password"
     value={password}
@@ -89,9 +87,9 @@ export default function Login() {
     </button>
     </form>
 
-    <p className="text-center mt-6 text-gray-400">
+    <p className="text-center mt-6 text-gray-600">
     ¿No tienes cuenta?{' '}
-    <Link to="/register" className="text-primary hover:text-indigo-400">
+    <Link to="/register" className="text-primary hover:text-indigo-600">
     Regístrate aquí
     </Link>
     </p>
