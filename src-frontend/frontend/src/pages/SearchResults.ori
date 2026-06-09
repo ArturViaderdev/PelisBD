@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { moviesService } from '../services/api';
+import { moviesService, tvService } from '../services/api';
 import MovieCard from '../components/MovieCard';
 import FilterBar from '../components/FilterBar';
 
 export default function SearchResults() {
   const [searchParams] = useSearchParams();
-  const query = (searchParams.get('q') || '').trim();
-
+  const query = searchParams.get('q');
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [filterType, setFilterType] = useState('all');
@@ -15,22 +14,23 @@ export default function SearchResults() {
 
   useEffect(() => {
     const searchContent = async () => {
-      if (!query) {
-        setResults([]);
-        return;
-      }
+      if (!query) return;
 
       try {
         setIsLoading(true);
-        const moviesRes = await moviesService.searchMovies(query);
-        const movies = (moviesRes.data?.results || []).map((item) => ({
-          ...item,
-          type: 'movie',
-        }));
-        setResults(movies);
+        const [moviesRes, tvRes] = await Promise.all([
+          moviesService.searchMovies(query),
+          tvService.searchTV(query),
+        ]);
+
+        const combined = [
+          ...moviesRes.data.results.map(item => ({ ...item, type: 'movie' })),
+          ...tvRes.data.results.map(item => ({ ...item, type: 'tv' })),
+        ];
+
+        setResults(combined);
       } catch (error) {
         console.error('Error searching:', error);
-        setResults([]);
       } finally {
         setIsLoading(false);
       }
@@ -76,4 +76,3 @@ export default function SearchResults() {
     </div>
   );
 }
-

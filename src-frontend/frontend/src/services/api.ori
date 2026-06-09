@@ -21,9 +21,7 @@ export const moviesService = {
   getCategories: () =>
     api.get('/movies/categories'),
   searchMovies: (query, page = 1) =>
-    api.get('/movies/search', {
-      params: { query, page },
-  }),
+    api.get(`/movies/search?query=${query}&page=${page}`),
   getMovieDetail: (id) =>
     api.get(`/movies/${id}`),
   getMoviesByCategory: (category, page = 1) =>

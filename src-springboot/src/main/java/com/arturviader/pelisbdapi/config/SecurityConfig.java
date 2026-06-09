@@ -58,7 +58,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/confirmemail", "/error")
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/confirmemail", "/error", "/api/movies/search")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
