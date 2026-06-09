@@ -4,7 +4,7 @@ import com.arturviader.pelisbdapi.model.MovieTMDB;
 
 import java.util.List;
 
-public record MovieResponseTMDB(
+public record MoviesResponseTMDB(
         int page,
         int total_results,
         int total_pages,

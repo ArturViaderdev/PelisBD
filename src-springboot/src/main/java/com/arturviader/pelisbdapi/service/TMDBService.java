@@ -1,6 +1,7 @@
 package com.arturviader.pelisbdapi.service;
 
-import com.arturviader.pelisbdapi.dto.MovieResponseTMDB;
+import com.arturviader.pelisbdapi.dto.MoviesResponseTMDB;
+import com.arturviader.pelisbdapi.model.MovieDetailTMDB;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,18 @@ public class TMDBService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public MovieResponseTMDB searchMovie(String query) {
+    public MoviesResponseTMDB searchMovie(String query) {
         String url = "https://api.themoviedb.org/3/search/movie?query=" + query + "&api_key=" + apiKey;
 
-        ResponseEntity<MovieResponseTMDB> response = restTemplate.getForEntity(url, MovieResponseTMDB.class);
+        ResponseEntity<MoviesResponseTMDB> response = restTemplate.getForEntity(url, MoviesResponseTMDB.class);
+        return response.getBody();
+    }
+
+    public MovieDetailTMDB getMovieById(Long id) {
+        String url = "https://api.themoviedb.org/3/movie/" + id +
+                "?api_key=" + apiKey + "&language=es-ES";
+
+        ResponseEntity<MovieDetailTMDB> response = restTemplate.getForEntity(url, MovieDetailTMDB.class);
         return response.getBody();
     }
 }
