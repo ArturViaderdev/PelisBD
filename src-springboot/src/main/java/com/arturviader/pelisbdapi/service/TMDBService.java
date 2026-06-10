@@ -3,6 +3,7 @@ package com.arturviader.pelisbdapi.service;
 import com.arturviader.pelisbdapi.dto.GenreListResponseTMDB;
 import com.arturviader.pelisbdapi.dto.MoviesResponseTMDB;
 import com.arturviader.pelisbdapi.dto.SeriesResponseTMDB;
+import com.arturviader.pelisbdapi.dto.VideosResponseDTO;
 import com.arturviader.pelisbdapi.exception.IncorrectTimeWidow;
 import com.arturviader.pelisbdapi.model.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -186,8 +187,8 @@ public class TMDBService {
         String url = "https://api.themoviedb.org/3/movie/" + movieId + "/videos" +
                 "?api_key=" + apiKey + "&language=es-ES";
         try {
-            ResponseEntity<VideoTMDB[]> response = restTemplate.getForEntity(url, VideoTMDB[].class);
-            return Arrays.asList(response.getBody());
+            ResponseEntity<VideosResponseDTO> response = restTemplate.getForEntity(url, VideosResponseDTO.class);
+            return response.getBody() != null ? response.getBody().results() : List.of();
         } catch (Exception e) {
             return List.of();
         }
@@ -197,8 +198,8 @@ public class TMDBService {
         String url = "https://api.themoviedb.org/3/tv/" + tvId + "/videos" +
                 "?api_key=" + apiKey + "&language=es-ES";
         try {
-            ResponseEntity<VideoTMDB[]> response = restTemplate.getForEntity(url, VideoTMDB[].class);
-            return Arrays.asList(response.getBody());
+            ResponseEntity<VideosResponseDTO> response = restTemplate.getForEntity(url, VideosResponseDTO.class);
+            return response.getBody() != null ? response.getBody().results() : List.of();
         } catch (Exception e) {
             return List.of();
         }

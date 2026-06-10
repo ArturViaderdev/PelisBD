@@ -32,8 +32,10 @@ export const moviesService = {
 
 // TV Shows
 export const tvService = {
-  getPopular: (page = 1) =>
-    api.get(`/tv/popular?page=${page}`),
+ getPopular: (page = 1) =>
+  api.get('/movies/popular', {
+    params: { page },
+  }),
   getTrending: (timeWindow = 'week') =>
     api.get(`/tv/trending?timeWindow=${timeWindow}`),
   searchTV: (query, page = 1) =>

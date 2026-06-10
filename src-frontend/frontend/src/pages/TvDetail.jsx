@@ -1,16 +1,21 @@
+/**
+ * TvDetail.jsx
+ * Detalle de una serie con el componente VideoList reutilizable
+ */
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { tvService, reviewService, userService } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import RatingStars from '../components/RatingStars';
 import CommentSection from '../components/CommentSection';
-import EpisodeTracker from '../components/EpisodeTracker';
 import { FiBookmark, FiCheck } from 'react-icons/fi';
+import VideoList from '../components/VideoList';
 
-export default function TVDetail() {
+export default function TvDetail() {
   const { id } = useParams();
   const { user } = useAuthStore();
-  const [tvShow, setTVShow] = useState(null);
+  const [tv, setTv] = useState(null);
   const [rating, setRating] = useState(0);
   const [comments, setComments] = useState([]);
   const [isWatched, setIsWatched] = useState(false);
@@ -21,8 +26,8 @@ export default function TVDetail() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const tvRes = await tvService.getTVDetail(id);
-        setTVShow(tvRes.data);
+        const tvRes = await tvService.getTvDetail(id);
+        setTv(tvRes.data);
 
         if (user) {
           const [ratingsRes, commentsRes] = await Promise.all([
@@ -35,7 +40,7 @@ export default function TVDetail() {
           setComments(commentsRes.data || []);
         }
       } catch (error) {
-        console.error('Error fetching TV details:', error);
+        console.error('Error fetching TV show details:', error);
       } finally {
         setIsLoading(false);
       }
@@ -53,16 +58,7 @@ export default function TVDetail() {
       await reviewService.rateItem('tv', id, newRating);
       setRating(newRating);
     } catch (error) {
-      console.error('Error rating TV:', error);
-    }
-  };
-
-  const handleMarkEpisode = async (season, episode, watched) => {
-    if (!user) return;
-    try {
-      await userService.markEpisode(id, season, episode, watched);
-    } catch (error) {
-      console.error('Error marking episode:', error);
+      console.error('Error rating TV show:', error);
     }
   };
 
@@ -114,10 +110,10 @@ export default function TVDetail() {
   };
 
   if (isLoading) return <div className="text-center py-12">Cargando...</div>;
-  if (!tvShow) return <div className="text-center py-12">Serie no encontrada</div>;
+  if (!tv) return <div className="text-center py-12">Serie no encontrada</div>;
 
-  const backdropUrl = tvShow.backdrop_path
-    ? `https://image.tmdb.org/t/p/w1280${tvShow.backdrop_path}`
+  const backdropUrl = tv.backdrop_path
+    ? `https://image.tmdb.org/t/p/w1280${tv.backdrop_path}`
     : '';
 
   return (
@@ -127,7 +123,7 @@ export default function TVDetail() {
         <div className="relative rounded-lg overflow-hidden h-96">
           <img
             src={backdropUrl}
-            alt={tvShow.name}
+            alt={tv.name}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black bg-opacity-40" />
@@ -138,15 +134,15 @@ export default function TVDetail() {
         {/* Póster */}
         <div className="md:col-span-1">
           <img
-            src={`https://image.tmdb.org/t/p/w342${tvShow.poster_path}`}
-            alt={tvShow.name}
+            src={`https://image.tmdb.org/t/p/w342${tv.poster_path}`}
+            alt={tv.name}
             className="w-full rounded-lg shadow-lg"
           />
         </div>
 
         {/* Información */}
         <div className="md:col-span-3 space-y-4">
-          <h1 className="text-4xl font-bold">{tvShow.name}</h1>
+          <h1 className="text-4xl font-bold">{tv.name}</h1>
 
           <div className="flex gap-4 flex-wrap">
             <button
@@ -175,10 +171,10 @@ export default function TVDetail() {
             <p className="text-gray-400 text-sm mb-2">Calificación de TMDB</p>
             <div className="flex items-center gap-4">
               <div className="text-4xl font-bold text-yellow-400">
-                {tvShow.vote_average?.toFixed(1)}
+                {tv.vote_average?.toFixed(1)}
               </div>
               <div className="text-gray-400">
-                {tvShow.vote_count?.toLocaleString()} votos
+                {tv.vote_count?.toLocaleString()} votos
               </div>
             </div>
           </div>
@@ -192,47 +188,35 @@ export default function TVDetail() {
 
           <div>
             <p className="text-gray-400 text-sm mb-2">Descripción</p>
-            <p className="text-white leading-relaxed">{tvShow.overview}</p>
+            <p className="text-white leading-relaxed">{tv.overview}</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            {tvShow.first_air_date && (
-              <div>
-                <p className="text-gray-400">Fecha de estreno</p>
-                <p>{new Date(tvShow.first_air_date).toLocaleDateString('es-ES')}</p>
-              </div>
-            )}
-            {tvShow.number_of_seasons && (
-              <div>
-                <p className="text-gray-400">Temporadas</p>
-                <p>{tvShow.number_of_seasons}</p>
-              </div>
-            )}
-            {tvShow.number_of_episodes && (
-              <div>
-                <p className="text-gray-400">Episodios</p>
-                <p>{tvShow.number_of_episodes}</p>
-              </div>
-            )}
-            {tvShow.status && (
-              <div>
-                <p className="text-gray-400">Estado</p>
-                <p>{tvShow.status}</p>
-              </div>
-            )}
-          </div>
+          {tv.first_air_date && (
+            <div>
+              <p className="text-gray-400 text-sm">
+                Fecha de lanzamiento: {new Date(tv.first_air_date).toLocaleDateString('es-ES')}
+              </p>
+            </div>
+          )}
+
+          {tv.number_of_episodes && (
+            <div>
+              <p className="text-gray-400 text-sm">Episodios: {tv.number_of_episodes}</p>
+            </div>
+          )}
+
+          {tv.number_of_seasons && (
+            <div>
+              <p className="text-gray-400 text-sm">Temporadas: {tv.number_of_seasons}</p>
+            </div>
+          )}
+
+          {/* ✅ VideoList reutilizable */}
+          {tv.videos && tv.videos.length > 0 && (
+            <VideoList videos={tv.videos} title={tv.name} />
+          )}
         </div>
       </div>
-
-      {/* Episodios */}
-      {user && tvShow.seasons && tvShow.seasons.length > 0 && (
-        <div className="border-t border-gray-800 pt-8">
-          <EpisodeTracker
-            seasons={tvShow.seasons}
-            onMarkEpisode={handleMarkEpisode}
-          />
-        </div>
-      )}
 
       {/* Comentarios */}
       {user && (

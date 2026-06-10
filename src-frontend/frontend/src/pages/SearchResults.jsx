@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { moviesService } from '../services/api';
 import MovieCard from '../components/MovieCard';
@@ -14,7 +14,7 @@ export default function SearchResults() {
   const [sortBy, setSortBy] = useState('popularity');
 
   useEffect(() => {
-    const searchContent = async () => {
+    const searchMovies = async () => {
       if (!query) {
         setResults([]);
         return;
@@ -22,22 +22,44 @@ export default function SearchResults() {
 
       try {
         setIsLoading(true);
-        const moviesRes = await moviesService.searchMovies(query);
-        const movies = (moviesRes.data?.results || []).map((item) => ({
+
+        const response = await moviesService.searchMovies(query);
+        const movies = (response.data?.results || []).map((item) => ({
           ...item,
           type: 'movie',
         }));
+
         setResults(movies);
       } catch (error) {
-        console.error('Error searching:', error);
+        console.error('Error searching movies:', error);
         setResults([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    searchContent();
+    searchMovies();
   }, [query]);
+
+  const filteredResults = useMemo(() => {
+    let data = [...results];
+
+    if (filterType !== 'all') {
+      data = data.filter((item) => item.type === filterType);
+    }
+
+    if (sortBy === 'title') {
+      data.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+    } else if (sortBy === 'date') {
+      data.sort(
+        (a, b) =>
+          new Date(b.release_date || 0).getTime() -
+          new Date(a.release_date || 0).getTime()
+      );
+    }
+
+    return data;
+  }, [results, filterType, sortBy]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -54,9 +76,15 @@ export default function SearchResults() {
 
       {isLoading ? (
         <div className="text-center py-12">
-          <p className="text-gray-400">Buscando contenido...</p>
+          <p className="text-gray-400">Buscando películas...</p>
         </div>
-      ) : results.length === 0 ? (
+      ) : !query ? (
+        <div className="text-center py-12">
+          <p className="text-gray-400 text-lg">
+            Escribe un término de búsqueda.
+          </p>
+        </div>
+      ) : filteredResults.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-400 text-lg">
             No se encontraron resultados para "{query}"
@@ -64,7 +92,7 @@ export default function SearchResults() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {results.map((item) => (
+          {filteredResults.map((item) => (
             <MovieCard
               key={`${item.type}-${item.id}`}
               item={item}
@@ -76,4 +104,3 @@ export default function SearchResults() {
     </div>
   );
 }
-

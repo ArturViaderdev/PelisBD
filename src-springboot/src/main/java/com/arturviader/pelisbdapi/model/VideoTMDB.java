@@ -7,6 +7,10 @@ public class VideoTMDB {
     private String id;
     private String iso_639_1;
     private String name;
+    private String site;
+    private String size;
+    private String type;
+    private String key;
 
     public VideoTMDB(String id, String iso_639_1, String name, String site, String size, String type, String key) {
         this.id = id;
@@ -73,9 +77,4 @@ public class VideoTMDB {
     public void setKey(String key) {
         this.key = key;
     }
-
-    private String site;
-    private String size;
-    private String type;
-    private String key;
 }
