@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class, IncorrectTimeWidow.class})
     public ResponseEntity<ErrorResponse> badRequest(MethodArgumentNotValidException ex, WebRequest request) {
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
         String message = ex.getBindingResult().getFieldErrors().stream()
