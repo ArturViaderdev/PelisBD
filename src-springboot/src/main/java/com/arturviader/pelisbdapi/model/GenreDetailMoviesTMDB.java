@@ -8,12 +8,18 @@ import java.util.List;
 public class GenreDetailMoviesTMDB {
     private Long id;
     private String name;
-    private List<MovieTMDB> movies;
+    private int page;
+    private int total_results;
+    private int total_pages;
+    private List<MovieTMDB> results;
 
-    public GenreDetailMoviesTMDB(Long id, String name, List<MovieTMDB> movies) {
+    public GenreDetailMoviesTMDB(Long id, String name, int page, int total_results, int total_pages, List<MovieTMDB> results) {
         this.id = id;
         this.name = name;
-        this.movies = movies;
+        this.page = page;
+        this.total_results = total_results;
+        this.total_pages = total_pages;
+        this.results = results;
     }
 
     public Long getId() {
@@ -32,11 +38,35 @@ public class GenreDetailMoviesTMDB {
         this.name = name;
     }
 
-    public List<MovieTMDB> getMovies() {
-        return movies;
+    public int getPage() {
+        return page;
     }
 
-    public void setMovies(List<MovieTMDB> movies) {
-        this.movies = movies;
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getTotal_results() {
+        return total_results;
+    }
+
+    public void setTotal_results(int total_results) {
+        this.total_results = total_results;
+    }
+
+    public int getTotal_pages() {
+        return total_pages;
+    }
+
+    public void setTotal_pages(int total_pages) {
+        this.total_pages = total_pages;
+    }
+
+    public List<MovieTMDB> getResults() {
+        return results;
+    }
+
+    public void setResults(List<MovieTMDB> results) {
+        this.results = results;
     }
 }

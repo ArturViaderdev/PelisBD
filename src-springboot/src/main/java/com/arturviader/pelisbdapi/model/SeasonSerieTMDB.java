@@ -1,14 +1,19 @@
 package com.arturviader.pelisbdapi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class SeasonSerieTMDB {
+    @JsonProperty("season_number")
     private Integer seasonNumber;
+    @JsonProperty("air_date")
     private String airDate;
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("overview")
     private String overview;
 
     public SeasonSerieTMDB(Integer seasonNumber, String airDate, String name, String overview) {

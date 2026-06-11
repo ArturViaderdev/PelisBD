@@ -6,6 +6,7 @@ import RatingStars from '../components/RatingStars';
 import CommentSection from '../components/CommentSection';
 import EpisodeTracker from '../components/EpisodeTracker';
 import { FiBookmark, FiCheck } from 'react-icons/fi';
+import VideoList from '../components/VideoList';
 
 export default function TVDetail() {
   const { id } = useParams();
@@ -234,6 +235,11 @@ export default function TVDetail() {
         </div>
       )}
 
+        {/* ✅ VideoList reutilizable */}
+          {tvShow.videos && tvShow.videos.length > 0 && (
+            <VideoList videos={tvShow.videos} title={tvShow.title} />
+          )}
+      
       {/* Comentarios */}
       {user && (
         <div className="border-t border-gray-800 pt-8">

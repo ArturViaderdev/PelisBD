@@ -1,24 +1,47 @@
 package com.arturviader.pelisbdapi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class SerieTMDB {
+    @JsonProperty("id")
     private Long id;
+
+    @JsonProperty("name")
     private String name;
+
+    @JsonProperty("original_name")
+    private String originalName;
+
+    @JsonProperty("overview")
     private String overview;
-    private String firstAirDate;
-    private Double voteAverage;
+
+    @JsonProperty("poster_path")
     private String posterPath;
 
-    public SerieTMDB(Long id, String name, String overview, String firstAirDate, Double voteAverage, String posterPath, String backdropPath) {
+    @JsonProperty("first_air_date")
+    private String firstAirDate;
+
+    @JsonProperty("vote_average")
+    private Double voteAverage;
+
+    @JsonProperty("vote_count")
+    private Integer voteCount;
+
+    @JsonProperty("popularity")
+    private Double popularity;
+
+    public SerieTMDB(Long id, String name, String originalName, String overview, String posterPath, String firstAirDate, Double voteAverage, Integer voteCount, Double popularity) {
         this.id = id;
         this.name = name;
+        this.originalName = originalName;
         this.overview = overview;
+        this.posterPath = posterPath;
         this.firstAirDate = firstAirDate;
         this.voteAverage = voteAverage;
-        this.posterPath = posterPath;
-        this.backdropPath = backdropPath;
+        this.voteCount = voteCount;
+        this.popularity = popularity;
     }
 
     public Long getId() {
@@ -37,12 +60,28 @@ public class SerieTMDB {
         this.name = name;
     }
 
+    public String getOriginalName() {
+        return originalName;
+    }
+
+    public void setOriginalName(String originalName) {
+        this.originalName = originalName;
+    }
+
     public String getOverview() {
         return overview;
     }
 
     public void setOverview(String overview) {
         this.overview = overview;
+    }
+
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
     }
 
     public String getFirstAirDate() {
@@ -61,21 +100,19 @@ public class SerieTMDB {
         this.voteAverage = voteAverage;
     }
 
-    public String getPosterPath() {
-        return posterPath;
+    public Integer getVoteCount() {
+        return voteCount;
     }
 
-    public void setPosterPath(String posterPath) {
-        this.posterPath = posterPath;
+    public void setVoteCount(Integer voteCount) {
+        this.voteCount = voteCount;
     }
 
-    public String getBackdropPath() {
-        return backdropPath;
+    public Double getPopularity() {
+        return popularity;
     }
 
-    public void setBackdropPath(String backdropPath) {
-        this.backdropPath = backdropPath;
+    public void setPopularity(Double popularity) {
+        this.popularity = popularity;
     }
-
-    private String backdropPath;
 }

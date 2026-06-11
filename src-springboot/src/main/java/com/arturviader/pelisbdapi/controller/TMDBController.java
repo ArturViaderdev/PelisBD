@@ -1,5 +1,7 @@
 package com.arturviader.pelisbdapi.controller;
 
+import com.arturviader.pelisbdapi.dto.MoviesResponseTMDB;
+import com.arturviader.pelisbdapi.dto.SeriesResponseTMDB;
 import com.arturviader.pelisbdapi.model.*;
 import com.arturviader.pelisbdapi.service.TMDBService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,32 +33,32 @@ public class TMDBController {
     }
 
     @GetMapping("/api/movies/popular")
-    public ResponseEntity<List<MovieTMDB>> getPopularMovies(
+    public ResponseEntity<MoviesResponseTMDB> getPopularMovies(
             @RequestParam(defaultValue = "1") int page) {
-        List<MovieTMDB> movies = tmdbService.getPopularMovies(page);
+        MoviesResponseTMDB movies = tmdbService.getPopularMovies(page);
         return ResponseEntity.ok(movies);
     }
 
     @GetMapping("/api/movies/trending")
-    public ResponseEntity<List<MovieTMDB>> getTrendingMovies(
+    public ResponseEntity<MoviesResponseTMDB> getTrendingMovies(
             @RequestParam(defaultValue = "day") String timeWindow,
             @RequestParam(defaultValue = "1") int page) {
-        List<MovieTMDB> movies = tmdbService.getTrendingMovies(timeWindow, page);
+        MoviesResponseTMDB movies = tmdbService.getTrendingMovies(timeWindow, page);
         return ResponseEntity.ok(movies);
     }
 
     @GetMapping("/api/tv/popular")
-    public ResponseEntity<List<SerieTMDB>> getPopularTvShows(
+    public ResponseEntity<SeriesResponseTMDB> getPopularTvShows(
             @RequestParam(defaultValue = "1") int page) {
-        List<SerieTMDB> shows = tmdbService.getPopularTvShows(page);
+        SeriesResponseTMDB shows = tmdbService.getPopularTvShows(page);
         return ResponseEntity.ok(shows);
     }
 
     @GetMapping("/api/tv/trending")
-    public ResponseEntity<List<SerieTMDB>> getTrendingTvShows(
+    public ResponseEntity<SeriesResponseTMDB> getTrendingTvShows(
             @RequestParam(defaultValue = "day") String timeWindow,
             @RequestParam(defaultValue = "1") int page) {
-        List<SerieTMDB> shows = tmdbService.getTrendingTvShows(timeWindow, page);
+        SeriesResponseTMDB shows = tmdbService.getTrendingTvShows(timeWindow, page);
         return ResponseEntity.ok(shows);
     }
 
@@ -112,12 +114,11 @@ public class TMDBController {
         return ResponseEntity.ok(videos);
     }
 
-    @GetMapping("/api/movies/genre/{id}")
+    @GetMapping("/api/movies/category/{id}")
     public ResponseEntity<GenreDetailMoviesTMDB> getGenreDetail(
             @PathVariable Long id,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int limit) {
-
+            @RequestParam(defaultValue = "1") int page) {
+        int limit = 20;
         GenreDetailMoviesTMDB detail = tmdbService.getGenreDetail(id, page, limit);
         if (detail == null) {
             return ResponseEntity.notFound().build();
@@ -125,7 +126,7 @@ public class TMDBController {
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping("/api/tv/genre/{id}")
+    @GetMapping("/api/tv/category/{id}")
     public ResponseEntity<GenreDetailSeriesTMDB> getGenreDetailSeries(
             @PathVariable Long id,
             @RequestParam(defaultValue = "1") int page,
@@ -138,7 +139,7 @@ public class TMDBController {
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping ("/api/genres")
+    @GetMapping ("/api/movies/categories")
     public ResponseEntity<List<Genre>> getAllGenres() {
         return ResponseEntity.ok(tmdbService.getAllGenres());
     }

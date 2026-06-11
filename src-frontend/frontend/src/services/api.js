@@ -16,32 +16,39 @@ export const authService = {
 export const moviesService = {
   getPopular: (page = 1) =>
     api.get(`/movies/popular?page=${page}`),
-  getTrending: (timeWindow = 'week') =>
-    api.get(`/movies/trending?timeWindow=${timeWindow}`),
+
+  getTrending: (page=1, timeWindow = 'week') =>
+    api.get(`/movies/trending?page=${page}&timeWindow=${timeWindow}`),
+
   getCategories: () =>
     api.get('/movies/categories'),
+
   searchMovies: (query, page = 1) =>
     api.get('/movies/search', {
       params: { query, page },
-  }),
+    }),
+
   getMovieDetail: (id) =>
     api.get(`/movies/${id}`),
+
   getMoviesByCategory: (category, page = 1) =>
     api.get(`/movies/category/${category}?page=${page}`),
 };
 
 // TV Shows
 export const tvService = {
- getPopular: (page = 1) =>
-  api.get('/movies/popular', {
-    params: { page },
-  }),
-  getTrending: (timeWindow = 'week') =>
-    api.get(`/tv/trending?timeWindow=${timeWindow}`),
+  getPopular: (page = 1) =>
+    api.get(`/tv/popular?page=${page}`), // ✅ Cambiado: /tv/popular
+
+  getTrending: (page=1, timeWindow = 'week') =>
+    api.get(`/tv/trending?page=${page}&timeWindow=${timeWindow}`), // ✅ Cambiado: /tv/trending
+
   searchTV: (query, page = 1) =>
     api.get(`/tv/search?query=${query}&page=${page}`),
+
   getTVDetail: (id) =>
     api.get(`/tv/${id}`),
+
   getTVByCategory: (category, page = 1) =>
     api.get(`/tv/category/${category}?page=${page}`),
 };
@@ -83,4 +90,40 @@ export const reviewService = {
     api.delete(`/reviews/comments/${commentId}`),
   updateComment: (commentId, text) =>
     api.put(`/reviews/comments/${commentId}`, { text }),
+};
+
+export const getCategoryList = async () => {
+  try {
+    const response = api.get('/movies/categories');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+};
+
+export const getTvCategories = async () => {
+  try {
+    const response = await api.get('/tv/categories');
+    return Array.isArray(response.data) ? response.data : response.data.genres || [];
+  } catch (error) {
+    return [
+      { id: 10759, name: 'Acción y Aventura' },
+      { id: 16, name: 'Animación' },
+      { id: 35, name: 'Comedia' },
+      { id: 80, name: 'Crimen' },
+      { id: 99, name: 'Documental' },
+      { id: 18, name: 'Drama' },
+      { id: 10751, name: 'Familia' },
+      { id: 10765, name: 'Fantasía' },
+      { id: 10762, name: 'Reality' },
+      { id: 10763, name: 'Telenovela' },
+      { id: 10764, name: 'Soap' },
+      { id: 10766, name: 'Misterio' },
+      { id: 10767, name: 'Romance' },
+      { id: 10768, name: 'Sci-Fi' },
+      { id: 10769, name: 'Guerra' },
+      { id: 10770, name: 'Película para TV' },
+    ];
+  }
 };

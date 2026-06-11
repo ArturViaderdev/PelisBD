@@ -13,6 +13,9 @@ import TVDetail from './pages/TVDetail';
 import SearchResults from './pages/SearchResults';
 import Watchlist from './pages/Watchlist';
 import Watched from './pages/Watched';
+import TrendingMovies from './pages/TrendingMovies';
+import TrendingTV from './pages/TrendingTV';
+import CategoryMovies from './pages/CategoryMovies';
 
 function PrivateRoute({ children }) {
   const { isAuthenticated } = useAuthStore();
@@ -33,6 +36,9 @@ function App() {
           <Route path="/movie/:id" element={<MovieDetail />} />
           <Route path="/tv/:id" element={<TVDetail />} />
           <Route path="/search" element={<SearchResults />} />
+           <Route path="/movies/trending" element={<TrendingMovies />} />
+           <Route path="/tv/trending" element={<TrendingTV />} />
+           <Route path="/movie/category/:id" element={<CategoryMovies />} />
           <Route
             path="/watchlist"
             element={

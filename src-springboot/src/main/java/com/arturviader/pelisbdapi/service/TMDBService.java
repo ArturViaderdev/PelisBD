@@ -49,52 +49,52 @@ public class TMDBService {
         return response.getBody();
     }
 
-    public List<MovieTMDB> getPopularMovies(int page) {
+    public MoviesResponseTMDB getPopularMovies(int page) {
         String url = "https://api.themoviedb.org/3/movie/popular" +
                 "?api_key=" + apiKey + "&language=es-ES&page=" + page;
         try {
-            ResponseEntity<MovieTMDB[]> response = restTemplate.getForEntity(url, MovieTMDB[].class);
-            return Arrays.asList(response.getBody());
+            ResponseEntity<MoviesResponseTMDB> response = restTemplate.getForEntity(url, MoviesResponseTMDB.class);
+            return response.getBody();
         } catch (Exception e) {
-            return List.of();
+            return null;
         }
     }
 
-    public List<MovieTMDB> getTrendingMovies(String timeWindow, int page) {
+    public MoviesResponseTMDB getTrendingMovies(String timeWindow, int page) {
         if (!"day".equals(timeWindow) && !"week".equals(timeWindow)) {
             throw new IncorrectTimeWidow();
         }
         String url = "https://api.themoviedb.org/3/trending/movie/" + timeWindow +
                 "?api_key=" + apiKey + "&language=es-ES&page=1";
         try {
-            ResponseEntity<MovieTMDB[]> response = restTemplate.getForEntity(url, MovieTMDB[].class);
-            return Arrays.asList(response.getBody());
+            ResponseEntity<MoviesResponseTMDB> response = restTemplate.getForEntity(url, MoviesResponseTMDB.class);
+            return response.getBody();
         } catch (Exception e) {
-            return List.of();
+            return null;
         }
     }
 
-    public List<SerieTMDB> getPopularTvShows(int page) {
+    public SeriesResponseTMDB getPopularTvShows(int page) {
         String url = "https://api.themoviedb.org/3/tv/popular?api_key=" + apiKey + "&language=es-ES&page=" + page;
         try {
-            ResponseEntity<SerieTMDB[]> response = restTemplate.getForEntity(url, SerieTMDB[].class);
-            return Arrays.asList(response.getBody());
+            ResponseEntity<SeriesResponseTMDB> response = restTemplate.getForEntity(url, SeriesResponseTMDB.class);
+            return response.getBody();
         } catch (Exception e) {
-            return List.of();
+            return null;
         }
     }
 
-    public List<SerieTMDB> getTrendingTvShows(String timeWindow, int page) {
+    public SeriesResponseTMDB getTrendingTvShows(String timeWindow, int page) {
         if (!"day".equals(timeWindow) && !"week".equals(timeWindow)) {
             throw new IllegalArgumentException("timeWindow debe ser 'day' o 'week'");
         }
         String url = "https://api.themoviedb.org/3/trending/tv/" + timeWindow +
                 "?api_key=" + apiKey + "&language=es-ES&page=" + page;
         try {
-            ResponseEntity<SerieTMDB[]> response = restTemplate.getForEntity(url, SerieTMDB[].class);
-            return Arrays.asList(response.getBody());
+            ResponseEntity<SeriesResponseTMDB> response = restTemplate.getForEntity(url, SeriesResponseTMDB.class);
+            return response.getBody();
         } catch (Exception e) {
-            return List.of();
+            return null;
         }
     }
 
@@ -105,8 +105,8 @@ public class TMDBService {
         String url = "https://api.themoviedb.org/3/search/tv?api_key=" + apiKey +
                 "&language=es-ES&query=" + query + "&page=" + page;
         try {
-            ResponseEntity<SerieTMDB[]> response = restTemplate.getForEntity(url, SerieTMDB[].class);
-            return Arrays.asList(response.getBody());
+            ResponseEntity<SeriesResponseTMDB> response = restTemplate.getForEntity(url, SeriesResponseTMDB.class);
+            return response.getBody().results();
         } catch (Exception e) {
             return List.of();
         }
@@ -124,7 +124,7 @@ public class TMDBService {
     }
 
     public SerieDetailTMDB getTvShowDetailWithTrailer(Long showId) {
-        SerieDetailTMDB detail = getTvShowDetail(showId); // Detalle básico
+        SerieDetailTMDB detail = getTvShowDetail(showId);
         if (detail == null) return null;
 
         List<VideoTMDB> videos = getTvShowVideos(showId);
@@ -217,9 +217,9 @@ public class TMDBService {
                     .orElse(null);
 
             if (genre == null) return null;
-            List<MovieTMDB> movies = getMoviesByGenre(genreId, page, limit);
-            GenreDetailMoviesTMDB detail = new GenreDetailMoviesTMDB(genreId,genre.name(),movies);
-            return detail;
+            GenreDetailMoviesTMDB movies = getMoviesByGenre(genreId, page, limit,genre.name());
+
+            return movies;
         } catch (Exception e) {
             return null;
         }
@@ -245,7 +245,7 @@ public class TMDBService {
         }
     }
 
-    private List<MovieTMDB> getMoviesByGenre(Long genreId, int page, int limit) {
+    private GenreDetailMoviesTMDB getMoviesByGenre(Long genreId, int page, int limit,String name) {
         String url = "https://api.themoviedb.org/3/discover/movie?api_key=" + apiKey +
                 "&with_genres=" + genreId +
                 "&sort_by=popularity.desc" +
@@ -255,9 +255,10 @@ public class TMDBService {
 
         try {
             ResponseEntity<MoviesResponseTMDB> response = restTemplate.getForEntity(url, MoviesResponseTMDB.class);
-            return response.getBody() != null ? response.getBody().results() : List.of();
+            GenreDetailMoviesTMDB detail = new GenreDetailMoviesTMDB(genreId,name,page,response.getBody().total_results(),response.getBody().total_pages(),response.getBody().results());
+            return detail;
         } catch (Exception e) {
-            return List.of();
+            return null;
         }
     }
 
@@ -280,14 +281,15 @@ public class TMDBService {
     public List<Genre> getAllGenres() {
         String movieUrl = "https://api.themoviedb.org/3/genre/movie/list?api_key=" + apiKey + "&language=es-ES";
         List<Genre> movieGenres = getGenresFromUrl(movieUrl);
-        String tvUrl = "https://api.themoviedb.org/3/genre/tv/list?api_key=" + apiKey + "&language=es-ES";
-        List<Genre> tvGenres = getGenresFromUrl(tvUrl);
-        List<Genre> allGenres = new ArrayList<>();
-        allGenres.addAll(movieGenres);
+        //String tvUrl = "https://api.themoviedb.org/3/genre/tv/list?api_key=" + apiKey + "&language=es-ES";
+        //List<Genre> tvGenres = getGenresFromUrl(tvUrl);
+       // List<Genre> allGenres = new ArrayList<>();
+        /*allGenres.addAll(movieGenres);
         allGenres.addAll(tvGenres);
         return allGenres.stream()
                 .distinct()
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
+        return movieGenres;
     }
 
     private List<Genre> getGenresFromUrl(String url) {

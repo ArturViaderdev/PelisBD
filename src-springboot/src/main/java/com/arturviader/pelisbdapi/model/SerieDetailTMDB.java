@@ -1,74 +1,54 @@
 package com.arturviader.pelisbdapi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class SerieDetailTMDB extends SerieTMDB{
-    private String originalName;
-    private String lastAirDate;
-    private String status;
-    private String originalLanguage;
-    private Integer numberOfSeasons;
-    private Integer numberOfEpisodes;
+    @JsonProperty("backdrop_path")
     private String backdropPath;
-    private List<Genre> genres;
-    private String type;
-    private String homepage;
-    private String inProduction;
+
+    @JsonProperty("number_of_seasons")
+    private Integer numberOfSeasons;
+
+    @JsonProperty("number_of_episodes")
+    private Integer numberOfEpisodes;
+
+    @JsonProperty("status")
+    private String status;
+
+    @JsonProperty("seasons")
     private List<SeasonSerieTMDB> seasons;
+
     private String trailerKey;
+
     private List<VideoTMDB> videos;
 
-    public SerieDetailTMDB(Long id, String name, String overview, String firstAirDate, Double voteAverage, String posterPath, String backdropPath, String originalName, String lastAirDate, String status, String originalLanguage, Integer numberOfSeasons, Integer numberOfEpisodes, String backdropPath1, List<Genre> genres, String type, String homepage, String inProduction, List<SeasonSerieTMDB> seasons, String trailerKey, List<VideoTMDB> videos) {
-        super(id, name, overview, firstAirDate, voteAverage, posterPath, backdropPath);
-        this.originalName = originalName;
-        this.lastAirDate = lastAirDate;
-        this.status = status;
-        this.originalLanguage = originalLanguage;
+    public String getTrailerKey() {
+        return trailerKey;
+    }
+
+    public void setTrailerKey(String trailerKey) {
+        this.trailerKey = trailerKey;
+    }
+
+    public SerieDetailTMDB(Long id, String name, String originalName, String overview, String posterPath, String firstAirDate, Double voteAverage, Integer voteCount, Double popularity, String backdropPath, Integer numberOfSeasons, Integer numberOfEpisodes, String status, List<SeasonSerieTMDB> seasons) {
+        super(id, name, originalName, overview, posterPath, firstAirDate, voteAverage, voteCount, popularity);
+        this.backdropPath = backdropPath;
         this.numberOfSeasons = numberOfSeasons;
         this.numberOfEpisodes = numberOfEpisodes;
-        this.backdropPath = backdropPath1;
-        this.genres = genres;
-        this.type = type;
-        this.homepage = homepage;
-        this.inProduction = inProduction;
-        this.seasons = seasons;
-        this.trailerKey = trailerKey;
-        this.videos = videos;
-    }
-
-    public String getOriginalName() {
-        return originalName;
-    }
-
-    public void setOriginalName(String originalName) {
-        this.originalName = originalName;
-    }
-
-    public String getLastAirDate() {
-        return lastAirDate;
-    }
-
-    public void setLastAirDate(String lastAirDate) {
-        this.lastAirDate = lastAirDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
         this.status = status;
+        this.seasons = seasons;
     }
 
-    public String getOriginalLanguage() {
-        return originalLanguage;
+    public String getBackdropPath() {
+        return backdropPath;
     }
 
-    public void setOriginalLanguage(String originalLanguage) {
-        this.originalLanguage = originalLanguage;
+    public void setBackdropPath(String backdropPath) {
+        this.backdropPath = backdropPath;
     }
 
     public Integer getNumberOfSeasons() {
@@ -87,44 +67,12 @@ public class SerieDetailTMDB extends SerieTMDB{
         this.numberOfEpisodes = numberOfEpisodes;
     }
 
-    public String getBackdropPath() {
-        return backdropPath;
+    public String getStatus() {
+        return status;
     }
 
-    public void setBackdropPath(String backdropPath) {
-        this.backdropPath = backdropPath;
-    }
-
-    public List<Genre> getGenres() {
-        return genres;
-    }
-
-    public void setGenres(List<Genre> genres) {
-        this.genres = genres;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getHomepage() {
-        return homepage;
-    }
-
-    public void setHomepage(String homepage) {
-        this.homepage = homepage;
-    }
-
-    public String getInProduction() {
-        return inProduction;
-    }
-
-    public void setInProduction(String inProduction) {
-        this.inProduction = inProduction;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public List<SeasonSerieTMDB> getSeasons() {
@@ -133,14 +81,6 @@ public class SerieDetailTMDB extends SerieTMDB{
 
     public void setSeasons(List<SeasonSerieTMDB> seasons) {
         this.seasons = seasons;
-    }
-
-    public String getTrailerKey() {
-        return trailerKey;
-    }
-
-    public void setTrailerKey(String trailerKey) {
-        this.trailerKey = trailerKey;
     }
 
     public List<VideoTMDB> getVideos() {
