@@ -1,21 +1,24 @@
 package com.arturviader.pelisbdapi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class EpisodeSerieTMDB {
+    @JsonProperty("episode_number")
     private Integer episodeNumber;
     private String name;
     private String overview;
+    @JsonProperty("air_date")
     private String airDate;
-    private Double voteAverage;
 
-    public EpisodeSerieTMDB(Integer episodeNumber, String name, String overview, String airDate, Double voteAverage) {
+
+    public EpisodeSerieTMDB(Integer episodeNumber, String name, String overview, String airDate) {
         this.episodeNumber = episodeNumber;
         this.name = name;
         this.overview = overview;
         this.airDate = airDate;
-        this.voteAverage = voteAverage;
+
     }
 
     public Integer getEpisodeNumber() {
@@ -50,11 +53,5 @@ public class EpisodeSerieTMDB {
         this.airDate = airDate;
     }
 
-    public Double getVoteAverage() {
-        return voteAverage;
-    }
 
-    public void setVoteAverage(Double voteAverage) {
-        this.voteAverage = voteAverage;
-    }
 }

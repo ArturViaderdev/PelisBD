@@ -13,14 +13,14 @@ public class SeasonSerieTMDB {
     private String airDate;
     @JsonProperty("name")
     private String name;
-    @JsonProperty("overview")
-    private String overview;
+    @JsonProperty("episode_count")
+    private String episodeCount;
 
-    public SeasonSerieTMDB(Integer seasonNumber, String airDate, String name, String overview) {
+    public SeasonSerieTMDB(Integer seasonNumber, String airDate, String name, String episodeCount) {
         this.seasonNumber = seasonNumber;
         this.airDate = airDate;
         this.name = name;
-        this.overview = overview;
+        this.episodeCount = episodeCount;
     }
 
     public Integer getSeasonNumber() {
@@ -47,11 +47,11 @@ public class SeasonSerieTMDB {
         this.name = name;
     }
 
-    public String getOverview() {
-        return overview;
+    public String getEpisodeCount() {
+        return episodeCount;
     }
 
-    public void setOverview(String overview) {
-        this.overview = overview;
+    public void setEpisodeCount(String episodeCount) {
+        this.episodeCount = episodeCount;
     }
 }

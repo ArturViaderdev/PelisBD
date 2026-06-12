@@ -1,25 +1,46 @@
 package com.arturviader.pelisbdapi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class SeasonSerieDetailTMDB extends SeasonSerieTMDB{
-    private List<EpisodeSerieDetailTMDB> episodes;
+    private List<EpisodeSerieTMDB> episodes;
     private String posterPath;
+    private String overview;
+    @JsonProperty("tv_name")
+    private String tvName;
 
-    public SeasonSerieDetailTMDB(Integer seasonNumber, String airDate, String name, String overview, List<EpisodeSerieDetailTMDB> episodes, String posterPath) {
-        super(seasonNumber, airDate, name, overview);
+    public SeasonSerieDetailTMDB(Integer seasonNumber, String airDate, String name, String episodeCount, List<EpisodeSerieTMDB> episodes, String posterPath, String overview) {
+        super(seasonNumber, airDate, name, episodeCount);
         this.episodes = episodes;
         this.posterPath = posterPath;
+        this.overview = overview;
     }
 
-    public List<EpisodeSerieDetailTMDB> getEpisodes() {
+    public String getTvName() {
+        return tvName;
+    }
+
+    public void setTvName(String tvName) {
+        this.tvName = tvName;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
+
+    public List<EpisodeSerieTMDB> getEpisodes() {
         return episodes;
     }
 
-    public void setEpisodes(List<EpisodeSerieDetailTMDB> episodes) {
+    public void setEpisodes(List<EpisodeSerieTMDB> episodes) {
         this.episodes = episodes;
     }
 

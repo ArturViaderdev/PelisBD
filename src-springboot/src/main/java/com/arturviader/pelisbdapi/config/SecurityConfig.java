@@ -58,7 +58,25 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/confirmemail", "/error", "/api/movies/search","/api/movies/{id}","/api/movies/popular/{page}","/api/movies/trending","/api/movies/categories","/api/movies/category/{page}","/api/tv/popular/{page}","/api/tv/trending","/api/tv/{id}","/api/tv/category/{id}")
+                        .requestMatchers(
+                                "/api/auth/register",
+                                "/api/auth/login",
+                                "/api/auth/confirmemail",
+                                "/error","/api/movies/{id}",
+                                "/api/movies/popular/{page}",
+                                "/api/movies/trending",
+                                "/api/movies/categories",
+                                "/api/movies/category/{page}",
+                                "/api/tv/popular/{page}",
+                                "/api/tv/trending",
+                                "/api/tv/{id}",
+                                "/api/tv/category/{id}",
+                                "/api/tv/categories",
+                                "/api/tv/{id}/season/{seasonNumber}",
+                                "/api/tv/{id}/season/{seasonNumber}/episode/{episodeNumber}",
+                                "/api/search/multi",
+                                "/api/search/movie",
+                                "/api/search/tv")
                         .permitAll()
                         .anyRequest()
                         .authenticated()

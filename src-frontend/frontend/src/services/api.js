@@ -24,7 +24,7 @@ export const moviesService = {
     api.get('/movies/categories'),
 
   searchMovies: (query, page = 1) =>
-    api.get('/movies/search', {
+    api.get('/search/movie', {
       params: { query, page },
     }),
 
@@ -44,14 +44,35 @@ export const tvService = {
     api.get(`/tv/trending?page=${page}&timeWindow=${timeWindow}`), // ✅ Cambiado: /tv/trending
 
   searchTV: (query, page = 1) =>
-    api.get(`/tv/search?query=${query}&page=${page}`),
+    api.get(`/search/tv?query=${query}&page=${page}`),
 
   getTVDetail: (id) =>
     api.get(`/tv/${id}`),
 
+  getCategories: () =>
+    api.get('/tv/categories'),
+
+  getTVSeasonDetail: (tvId, seasonNumber) =>
+    api.get(`/tv/${tvId}/season/${seasonNumber}`),
+
   getTVByCategory: (category, page = 1) =>
     api.get(`/tv/category/${category}?page=${page}`),
+  getTVEpisode: (tvId, seasonNumber, episodeNumber) =>
+    api.get(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`),
 };
+
+export const searchService = {
+  search: (query, page = 1) => {
+    return api.get(`/search/multi`, {
+      params: {
+        query,
+        page,
+        include_adult: false,
+      },
+    });
+  },
+};
+
 
 // User Lists
 export const userService = {

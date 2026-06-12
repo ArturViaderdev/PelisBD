@@ -1,10 +1,12 @@
 package com.arturviader.pelisbdapi.controller;
 
 import com.arturviader.pelisbdapi.dto.MoviesResponseTMDB;
+import com.arturviader.pelisbdapi.dto.SearchResultsMoviesAndTV;
 import com.arturviader.pelisbdapi.dto.SeriesResponseTMDB;
 import com.arturviader.pelisbdapi.model.*;
 import com.arturviader.pelisbdapi.service.TMDBService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +20,10 @@ public class TMDBController {
     @Autowired
     private TMDBService tmdbService;
 
-    @GetMapping("/api/movies/search")
-    public Object searchMovies(@RequestParam String query) {
-        return tmdbService.searchMovie(query);
+    @GetMapping("/api/search/movie")
+    public ResponseEntity<MoviesResponseTMDB> searchMovies(@RequestParam String query,
+                               @RequestParam (defaultValue = "1") int page) {
+        return ResponseEntity.ok(tmdbService.searchMovie(query,page));
     }
 
     @GetMapping("/api/movies/{id}")
@@ -62,12 +65,22 @@ public class TMDBController {
         return ResponseEntity.ok(shows);
     }
 
-    @GetMapping("/api/tv/search")
-    public ResponseEntity<List<SerieTMDB>> searchTvShows(
+    @GetMapping("/api/search/tv")
+    public ResponseEntity<SeriesResponseTMDB> searchTvShows(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int page) {
-        List<SerieTMDB> results = tmdbService.searchTvShows(query, page);
-        return ResponseEntity.ok(results);
+        return ResponseEntity.ok(tmdbService.searchTvShows(query, page));
+    }
+
+    @GetMapping("/api/search/multi")
+    public ResponseEntity<SearchResultsMoviesAndTV> searchAll(
+            @RequestParam String query
+    )
+    {
+        MoviesResponseTMDB results = tmdbService.searchMovie(query,1);
+        SeriesResponseTMDB resultstv = tmdbService.searchTvShows(query, 1);
+        SearchResultsMoviesAndTV all = new SearchResultsMoviesAndTV(results.results(),resultstv.results());
+        return ResponseEntity.ok(all);
     }
 
     @GetMapping("/api/tv/{id}")
@@ -142,6 +155,11 @@ public class TMDBController {
     @GetMapping ("/api/movies/categories")
     public ResponseEntity<List<Genre>> getAllGenres() {
         return ResponseEntity.ok(tmdbService.getAllGenres());
+    }
+
+    @GetMapping ("/api/tv/categories")
+    public ResponseEntity<List<Genre>> getAllTVGenres() {
+        return ResponseEntity.ok(tmdbService.getAllTVGenres());
     }
 
 

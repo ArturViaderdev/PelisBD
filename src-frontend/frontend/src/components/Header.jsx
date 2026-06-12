@@ -1,21 +1,52 @@
-import { Link, useNavigate } from 'react-router-dom';
+// src/components/Header.jsx
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FiSearch, FiLogOut, FiUser } from 'react-icons/fi';
 import { useAuthStore } from '../stores/authStore';
 import { useMoviesStore } from '../stores/moviesStore';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Header() {
   const { user, logout } = useAuthStore();
   const { setSearchQuery, reset } = useMoviesStore();
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ Para detectar cambios en URL
   const [searchInput, setSearchInput] = useState('');
+  const [searchType, setSearchType] = useState('both'); // 'movies', 'series', 'both'
+
+  // ✅ Recuperar búsqueda y tipo de la URL al montar el componente
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const query = urlParams.get('q') || '';
+    const type = urlParams.get('type') || 'both';
+
+    setSearchInput(query);
+    setSearchType(type);
+
+    // ✅ Si está en una ruta específica, actualiza el input
+    if (location.pathname === '/search-movies') {
+      setSearchType('movies');
+    } else if (location.pathname === '/search-tv') {
+      setSearchType('series');
+    } else if (location.pathname === '/search') {
+      setSearchType('both');
+    }
+  }, [location.search, location.pathname]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchInput.trim()) {
       setSearchQuery(searchInput);
       reset();
-      navigate(`/search?q=${searchInput}`);
+
+      // ✅ Navegar según el tipo seleccionado
+      const pathMap = {
+        movies: '/search-movies',
+        series: '/search-tv',
+        both: '/search',
+      };
+
+      const path = pathMap[searchType] || '/search';
+      navigate(`${path}?q=${encodeURIComponent(searchInput)}&type=${searchType}`);
     }
   };
 
@@ -33,14 +64,26 @@ export default function Header() {
           </Link>
 
           <form onSubmit={handleSearch} className="flex-1 max-w-md">
-            <div className="relative">
+            <div className="relative flex gap-2">
               <input
                 type="text"
                 placeholder="Buscar películas o series..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
               />
+
+              {/* ✅ Desplegable de tipo */}
+              <select
+                value={searchType}
+                onChange={(e) => setSearchType(e.target.value)}
+                className="px-3 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+              >
+                <option value="both">Ambos</option>
+                <option value="movies">Películas</option>
+                <option value="series">Series</option>
+              </select>
+
               <button
                 type="submit"
                 className="absolute right-3 top-2.5 text-gray-400 hover:text-white"

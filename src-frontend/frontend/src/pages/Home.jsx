@@ -50,7 +50,7 @@ export default function Home() {
           </p>
         </div>
 
-         {/* Categorías */}
+         {/* Categorías de películas */}
       <CategoryList 
       
       />
@@ -122,8 +122,17 @@ export default function Home() {
             <MovieCard key={show.id} item={show} type="tv" />
           ))}
         </div>
+      {/* Categorías de series */}
+      <div className="mt-8">
+        <div className="space-y-4">
+          <CategoryList 
+            type="tv" 
+            
+          />
+        </div>
       </div>
-)}
+      </div>
+    )}
       
       {isLoading && (
         <div className="text-center py-12">
