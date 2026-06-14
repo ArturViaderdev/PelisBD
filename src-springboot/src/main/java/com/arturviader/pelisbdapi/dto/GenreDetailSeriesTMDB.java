@@ -1,19 +1,16 @@
-package com.arturviader.pelisbdapi.model;
-
-import lombok.Data;
+package com.arturviader.pelisbdapi.dto;
 
 import java.util.List;
 
-@Data
-public class GenreDetailMoviesTMDB {
+public class GenreDetailSeriesTMDB {
     private Long id;
     private String name;
     private int page;
     private int total_results;
     private int total_pages;
-    private List<MovieTMDB> results;
+    private List<SerieTMDB> results;
 
-    public GenreDetailMoviesTMDB(Long id, String name, int page, int total_results, int total_pages, List<MovieTMDB> results) {
+    public GenreDetailSeriesTMDB(Long id, String name, int page, int total_results, int total_pages, List<SerieTMDB> results) {
         this.id = id;
         this.name = name;
         this.page = page;
@@ -62,11 +59,11 @@ public class GenreDetailMoviesTMDB {
         this.total_pages = total_pages;
     }
 
-    public List<MovieTMDB> getResults() {
+    public List<SerieTMDB> getResults() {
         return results;
     }
 
-    public void setResults(List<MovieTMDB> results) {
+    public void setResults(List<SerieTMDB> results) {
         this.results = results;
     }
 }

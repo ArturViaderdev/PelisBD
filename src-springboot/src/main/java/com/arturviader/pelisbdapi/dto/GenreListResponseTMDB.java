@@ -1,6 +1,5 @@
 package com.arturviader.pelisbdapi.dto;
 
-import com.arturviader.pelisbdapi.model.Genre;
 import lombok.Data;
 
 import java.util.List;

@@ -6,9 +6,13 @@ import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.model.VerificationToken;
 import com.arturviader.pelisbdapi.repository.UserRepository;
 import com.arturviader.pelisbdapi.repository.VerificationTokenRepository;
+import com.arturviader.pelisbdapi.security.JwtUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -69,28 +73,42 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public JwtResponse loginUser(LoginRequest dto) {
+        // 1. Busca el usuario por email
         User user = userRepository.findByEmail(dto.email())
                 .orElseThrow(UserNotFound::new);
+
         if (!user.isEnabled()) {
             throw new EmailNotConfirmed();
         }
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        dto.email(),
-                        dto.password()
-                )
-        );
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        // 2. Verifica la contraseña usando PasswordEncoder
+        if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
+            throw new BadCredentialsException("Invalid password");
+        }
+
+        // 3. Crea UserDetails manualmente
+        UserDetails userDetails = new JwtUserDetails(user);
+
+        // 4. Genera token
         String jwt = jwtService.generateToken(userDetails);
+
+        // 5. Extrae role
+        String role = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .map(auth -> auth.replace("ROLE_", ""))
+                .orElse("USER");
+
         return new JwtResponse(
                 jwt,
                 "Bearer",
                 user.getId(),
                 user.getEmail(),
                 user.getUserName(),
-                user.getRole().name()
+                role
         );
     }
+
 
     @Override
     public void confirmEmail(String token) {
@@ -106,5 +124,16 @@ public class UserServiceImpl implements UserService{
         userRepository.save(user);
 
         verificationTokenRepository.delete(verificationToken);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new NoUserAuthenticated();
+        }
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFound());
     }
 }

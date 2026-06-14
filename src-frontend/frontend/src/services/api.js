@@ -2,7 +2,7 @@ import api from '../utils/api';
 
 // Auth
 export const authService = {
-  register: (email, password, user) =>
+  register: (email, user, password) =>
     api.post('/auth/register', { email, password, userName:user }),
   login: (email, password) =>
     api.post('/auth/login', { email, password }),

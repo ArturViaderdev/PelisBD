@@ -1,4 +1,4 @@
-package com.arturviader.pelisbdapi.model;
+package com.arturviader.pelisbdapi.dto;
 
 import lombok.Data;
 

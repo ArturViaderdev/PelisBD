@@ -12,14 +12,14 @@ import org.springframework.web.context.request.WebRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler({EmailNotConfirmed.class})
+    @ExceptionHandler({EmailNotConfirmed.class, NoUserAuthenticated.class})
     public ResponseEntity<ErrorResponse> unauthorized(RuntimeException ex, WebRequest request){
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
         ErrorResponse body = new ErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), path);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
-    @ExceptionHandler({UserNotFound.class, TokenNotFoundException.class, TokenExpiredException.class})
+    @ExceptionHandler({UserNotFound.class, TokenNotFoundException.class, TokenExpiredException.class, ResourceNotFoundException.class})
     public ResponseEntity<ErrorResponse> notFound(RuntimeException ex, WebRequest request){
         String path = ((ServletWebRequest) request).getRequest().getRequestURI();
         ErrorResponse body = new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), path);

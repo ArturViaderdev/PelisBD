@@ -1,0 +1,15 @@
+package com.arturviader.pelisbdapi.repository;
+
+import com.arturviader.pelisbdapi.model.MediaType;
+import com.arturviader.pelisbdapi.model.User;
+import com.arturviader.pelisbdapi.model.UserWatchlistItem;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface UserWatchlistItemRepository extends JpaRepository<UserWatchlistItem, Long> {
+    Optional<UserWatchlistItem> findByUserAndTypeAndItemId(User user, MediaType type, Long itemId);
+    List<UserWatchlistItem> findByUser(User user);
+    List<UserWatchlistItem> findByTypeAndItemId(MediaType type, Long itemId);
+}

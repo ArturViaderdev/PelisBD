@@ -1,12 +1,8 @@
 package com.arturviader.pelisbdapi.controller;
 
-import com.arturviader.pelisbdapi.dto.MoviesResponseTMDB;
-import com.arturviader.pelisbdapi.dto.SearchResultsMoviesAndTV;
-import com.arturviader.pelisbdapi.dto.SeriesResponseTMDB;
-import com.arturviader.pelisbdapi.model.*;
+import com.arturviader.pelisbdapi.dto.*;
 import com.arturviader.pelisbdapi.service.TMDBService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -1,7 +1,5 @@
 package com.arturviader.pelisbdapi.dto;
 
-import com.arturviader.pelisbdapi.model.MovieTMDB;
-
 import java.util.List;
 
 public record MoviesResponseTMDB(

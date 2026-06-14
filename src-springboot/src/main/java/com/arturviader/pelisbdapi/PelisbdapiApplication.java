@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import java.util.Map;
 
 @SpringBootApplication
-public class PelisbdapiApplication {
+public class 	PelisbdapiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PelisbdapiApplication.class, args);

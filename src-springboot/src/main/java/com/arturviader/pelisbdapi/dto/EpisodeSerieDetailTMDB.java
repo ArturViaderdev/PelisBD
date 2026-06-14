@@ -1,7 +1,6 @@
-package com.arturviader.pelisbdapi.model;
+package com.arturviader.pelisbdapi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
 
 public class EpisodeSerieDetailTMDB extends EpisodeSerieTMDB {

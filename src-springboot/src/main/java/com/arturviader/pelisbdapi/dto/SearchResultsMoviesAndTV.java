@@ -1,8 +1,5 @@
 package com.arturviader.pelisbdapi.dto;
 
-import com.arturviader.pelisbdapi.model.MovieTMDB;
-import com.arturviader.pelisbdapi.model.SerieTMDB;
-
 import java.util.List;
 
 public class SearchResultsMoviesAndTV {
