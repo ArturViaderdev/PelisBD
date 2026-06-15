@@ -8,21 +8,24 @@ export default function Home() {
   const [popularMovies, setPopularMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [popularTV, setPopularTV] = useState([]);
+  const [trendingTV, setTrendingTV] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [moviesRes, trendingRes, tvRes] = await Promise.all([
+        const [moviesRes, trendingRes, tvRes,trendingTV] = await Promise.all([
           moviesService.getPopular(1),
-          moviesService.getTrending('week'),
+          moviesService.getTrending(1,'week'),
           tvService.getPopular(1),
+          tvService.getTrending(1,'week'),
         ]);
 
         setPopularMovies(moviesRes.data.results?.slice(0, 6) || []);
         setTrendingMovies(trendingRes.data.results?.slice(0, 6) || []);
         setPopularTV(tvRes.data.results?.slice(0, 6) || []);
+        setTrendingTV(trendingTV.data.results?.slice(0, 6) || []);
       } catch (error) {
         console.error('Error fetching home data:', error);
       } finally {
@@ -32,6 +35,8 @@ export default function Home() {
 
     fetchData();
   }, []);
+  
+  
 
   return (
     <div className="min-h-screen space-y-12 py-8">
@@ -45,7 +50,11 @@ export default function Home() {
           </p>
         </div>
 
-        <CategoryList type="movie" />
+         {/* Categorías de películas */}
+      <CategoryList 
+      
+      />
+    
       </div>
 
       {/* Películas Populares */}
@@ -99,6 +108,32 @@ export default function Home() {
         </div>
       )}
 
+      {/* Series en Tendencia */}
+    {!isLoading && trendingTV.length > 0 && (
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">Series en Tendencia esta Semana</h2>
+          <a href="/tv/trending" className="flex items-center gap-1 text-primary hover:text-indigo-400">
+            Ver más <FiChevronRight />
+          </a>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {trendingTV.map((show) => (
+            <MovieCard key={show.id} item={show} type="tv" />
+          ))}
+        </div>
+      {/* Categorías de series */}
+      <div className="mt-8">
+        <div className="space-y-4">
+          <CategoryList 
+            type="tv" 
+            
+          />
+        </div>
+      </div>
+      </div>
+    )}
+      
       {isLoading && (
         <div className="text-center py-12">
           <p className="text-gray-400">Cargando contenido...</p>
@@ -107,3 +142,4 @@ export default function Home() {
     </div>
   );
 }
+

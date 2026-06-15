@@ -6,6 +6,7 @@ import RatingStars from '../components/RatingStars';
 import CommentSection from '../components/CommentSection';
 import EpisodeTracker from '../components/EpisodeTracker';
 import { FiBookmark, FiCheck } from 'react-icons/fi';
+import VideoList from '../components/VideoList';
 
 export default function TVDetail() {
   const { id } = useParams();
@@ -224,16 +225,51 @@ export default function TVDetail() {
         </div>
       </div>
 
-      {/* Episodios */}
-      {user && tvShow.seasons && tvShow.seasons.length > 0 && (
-        <div className="border-t border-gray-800 pt-8">
-          <EpisodeTracker
-            seasons={tvShow.seasons}
-            onMarkEpisode={handleMarkEpisode}
-          />
-        </div>
-      )}
+    
 
+        {/* ✅ VideoList reutilizable */}
+          {tvShow.videos && tvShow.videos.length > 0 && (
+            <VideoList videos={tvShow.videos} title={tvShow.title} />
+          )}
+      
+      {/* Temporadas con estado de visto */}
+{tvShow.seasons && tvShow.seasons.length > 0 && (
+  <div className="border-t border-gray-800 pt-8">
+    <h2 className="text-2xl font-bold mb-6">Temporadas</h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {tvShow.seasons.map((season) => {
+        const watchedEpisodes = (season.episodes || []).filter(e => e.watched);
+        const isComplete = watchedEpisodes.length === season.episode_count;
+
+        return (
+          <a
+            key={season.season_number}
+            href={`/tv/${id}/season/${season.season_number}`}
+            className="block p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition text-center"
+          >
+            <div className="text-xl font-bold text-primary">
+              Temporada {season.season_number}
+            </div>
+            <div className="text-gray-400 text-sm mt-1">
+              {season.episode_count} episodios
+            </div>
+            {season.air_date && (
+              <div className="text-gray-500 text-xs mt-1">
+                {new Date(season.air_date).toLocaleDateString('es-ES')}
+              </div>
+            )}
+            {isComplete && (
+              <div className="text-green-400 text-xs mt-1 flex items-center justify-center gap-1">
+                <FiCheck size={12} /> Completada
+              </div>
+            )}
+          </a>
+        );
+      })}
+    </div>
+  </div>
+)}
+      
       {/* Comentarios */}
       {user && (
         <div className="border-t border-gray-800 pt-8">

@@ -9,22 +9,42 @@ const api = axios.create({
   },
 });
 
+const publicPaths = [
+  '/movies/search',
+  '/movies/popular',
+  '/movies/trending',
+  '/movies/categories',
+  '/tv/search',
+  '/tv/popular',
+  '/tv/trending',
+];
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
+  const isPublicRoute = publicPaths.some((path) =>
+    config.url?.startsWith(path)
+  );
+
+  if (token && !isPublicRoute) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isPublicRoute = publicPaths.some((path) =>
+      error.config?.url?.startsWith(path)
+    );
+
+    if (error.response?.status === 401 && !isPublicRoute) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );

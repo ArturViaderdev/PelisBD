@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/authStore';
 import RatingStars from '../components/RatingStars';
 import CommentSection from '../components/CommentSection';
 import { FiBookmark, FiCheck } from 'react-icons/fi';
+import VideoList from '../components/VideoList'; // ✅ Importar el componente reutilizable
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -197,6 +198,11 @@ export default function MovieDetail() {
             <div>
               <p className="text-gray-400 text-sm">Duración: {movie.runtime} minutos</p>
             </div>
+          )}
+
+          {/* ✅ VideoList reutilizable */}
+          {movie.videos && movie.videos.length > 0 && (
+            <VideoList videos={movie.videos} title={movie.title} />
           )}
         </div>
       </div>
