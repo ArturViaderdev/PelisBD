@@ -1,12 +1,11 @@
 package com.arturviader.pelisbdapi.service;
 
+import com.arturviader.pelisbdapi.dto.UserWatchListMapper;
 import com.arturviader.pelisbdapi.dto.UserWatchedMapper;
 import com.arturviader.pelisbdapi.dto.WatchedItemDto;
+import com.arturviader.pelisbdapi.dto.WatchlistItemDto;
 import com.arturviader.pelisbdapi.exception.ResourceNotFoundException;
-import com.arturviader.pelisbdapi.model.MediaType;
-import com.arturviader.pelisbdapi.model.Movie;
-import com.arturviader.pelisbdapi.model.User;
-import com.arturviader.pelisbdapi.model.UserWatchedItem;
+import com.arturviader.pelisbdapi.model.*;
 import com.arturviader.pelisbdapi.repository.UserEpisodeProgressRepository;
 import com.arturviader.pelisbdapi.repository.UserRepository;
 import com.arturviader.pelisbdapi.repository.UserWatchedItemRepository;
@@ -28,7 +27,7 @@ public class UserMediaServiceImpl implements UserMediaService {
     private UserWatchedItemRepository watchedRepo;
 
     @Autowired
-    private UserWatchlistItemRepository watchlistRepo;
+    private UserWatchlistItemRepository watchlistRepository;
 
     @Autowired
     private UserEpisodeProgressRepository episodeRepo;
@@ -41,6 +40,10 @@ public class UserMediaServiceImpl implements UserMediaService {
 
     @Autowired
     private UserWatchedMapper userWatchedMapper;
+
+    @Autowired
+    private UserWatchListMapper userWatchListMapper;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -52,7 +55,6 @@ public class UserMediaServiceImpl implements UserMediaService {
                 .orElse(new UserWatchedItem());
 
         movieService.saveIfNotExists(tmdbService.getMovieById(itemId),"movie");
-
         item.setUser(user);
         item.setType(type);
         item.setItemId(itemId);
@@ -74,8 +76,8 @@ public class UserMediaServiceImpl implements UserMediaService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public boolean isMovieWatched(Long tmdbId, String userName) {
-        // ✅ Buscar el usuario por email
         Optional<User> userOpt = userRepository.findByUserName(userName);
 
         if (userOpt.isEmpty()) {
@@ -87,6 +89,41 @@ public class UserMediaServiceImpl implements UserMediaService {
         return watchedRepo.existsByUserAndItemIdAndType(user, tmdbId, MediaType.movie);
     }
 
+    @Override
+    public void addToWatchlist(User user, MediaType type, Long tmdbId) {
+        UserWatchlistItem item = watchlistRepository.findByUserAndTypeAndItemId(user, type, tmdbId)
+                .orElse(new UserWatchlistItem());
+        movieService.saveIfNotExists(tmdbService.getMovieById(tmdbId),"movie");
+        item.setUser(user);
+        item.setType(type);
+        item.setItemId(tmdbId);
+
+        watchlistRepository.save(item);
+    }
+
+    @Override
+    public void removeFromWatchlist(User user, MediaType type, Long tmdbId) {
+        UserWatchlistItem item = watchlistRepository.findByUserAndTypeAndItemId(user, type, tmdbId)
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found"));
+        watchlistRepository.delete(item);
+    }
+
+    @Override
+    public boolean isMovieInWatchlist(String userId, Long tmdbId) {
+        Optional<User> userOpt = userRepository.findByUserName(userId);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+        User user = userOpt.get();
+        return watchlistRepository.existsByUserAndItemIdAndType(user, tmdbId, MediaType.movie);
+    }
+
+    @Override
+    public List<WatchlistItemDto> getWatchlist(User user) {
+        return watchlistRepository.findByUser(user).stream()
+                .map(userWatchListMapper::toDtoWithMovieData) // ✅ Ahora funciona
+                .collect(Collectors.toList());
+    }
 
 
 }

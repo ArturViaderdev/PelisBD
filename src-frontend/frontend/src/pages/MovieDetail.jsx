@@ -25,6 +25,21 @@ export default function MovieDetail() {
         setMovie(movieRes.data);
 
         if (user) {
+         try {
+            const watchedRes = await userService.isMovieWatched(id);
+            setIsWatched(watchedRes.data.value);
+        } catch (err) {
+          console.error('Error checking watched status:', err);
+          setIsWatched(false);
+        }
+        try {
+            const watchedRes = await userService.isMovieInWatchList(id);
+            setIsWatchlisted(watchedRes.data.value);
+        } catch (err) {
+            console.error('Error checking watchlisted status:', err);
+            setIsWatchlisted(false);
+        }
+        
           const [ratingsRes, commentsRes] = await Promise.all([
             reviewService.getItemRatings('movie', id),
             reviewService.getComments('movie', id, false),
@@ -43,6 +58,8 @@ export default function MovieDetail() {
 
     fetchData();
   }, [id, user]);
+  
+
 
   const handleRate = async (newRating) => {
     if (!user) {
@@ -217,6 +234,7 @@ export default function MovieDetail() {
             currentUserId={user.id}
           />
         </div>
+        
       )}
     </div>
   );

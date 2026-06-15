@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 public record WatchedItemDto(
-        @JsonProperty("id") Long id, // ✅ Ahora es tmdbId
+        @JsonProperty("id") Long id,
         @JsonProperty("type") String type,
         @JsonProperty("added_at") LocalDateTime addedAt,
         @JsonProperty("title") String title,

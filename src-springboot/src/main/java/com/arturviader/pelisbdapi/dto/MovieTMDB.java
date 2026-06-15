@@ -8,6 +8,8 @@ public class MovieTMDB {
     private String title;
     private String release_date;
     private String overview;
+    private boolean isWatchListed;
+    private boolean isWatched;
 
     public MovieTMDB(Long id, String title, String release_date, String overview, String poster_path) {
         this.id = id;
@@ -33,4 +35,20 @@ public class MovieTMDB {
 
     public String getPoster_path() { return poster_path; }
     public void setPoster_path(String poster_path) { this.poster_path = poster_path; }
+
+    public boolean isWatchListed() {
+        return isWatchListed;
+    }
+
+    public void setWatchListed(boolean watchListed) {
+        isWatchListed = watchListed;
+    }
+
+    public boolean isWatched() {
+        return isWatched;
+    }
+
+    public void setWatched(boolean watched) {
+        isWatched = watched;
+    }
 }

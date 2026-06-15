@@ -1,7 +1,6 @@
 package com.arturviader.pelisbdapi.controller;
 
-import com.arturviader.pelisbdapi.dto.WatchedItemDto;
-import com.arturviader.pelisbdapi.dto.WatchedRequest;
+import com.arturviader.pelisbdapi.dto.*;
 import com.arturviader.pelisbdapi.model.MediaType;
 import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.service.UserMediaService;
@@ -44,16 +43,45 @@ public class UserMediaController {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/watched/{tmdbId}")
-    public ResponseEntity<Boolean> isMovieWatched(
+    @GetMapping("/api/user/watched/{tmdbId}")
+    public ResponseEntity<BooleanDto> isMovieWatched(
             @PathVariable Long tmdbId)
     {
         User user = getCurrentUser();
         boolean isWatched = mediaService.isMovieWatched(tmdbId, user.getUserName());
-        return ResponseEntity.ok(isWatched);
+        return ResponseEntity.ok(new BooleanDto(isWatched));
     }
 
     public User getCurrentUser() {
         return userService.getCurrentUser();
+    }
+
+    @GetMapping("/api/user/watchlist")
+    public ResponseEntity<List<WatchlistItemDto>> getWatchlist() {
+        User user = getCurrentUser();
+        List<WatchlistItemDto> list = mediaService.getWatchlist(user);
+        return ResponseEntity.ok(list);
+    }
+
+
+    @PostMapping("/api/user/watchlist")
+    public ResponseEntity<String> addToWatchlist(@RequestBody WatchListRequest request) {
+        User user = getCurrentUser();
+        mediaService.addToWatchlist(user,MediaType.valueOf(request.type()),request.itemId());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/api/user/watchlist/{type}/{itemId}")
+    public ResponseEntity<String> removeFromWatchlist(@PathVariable String type, @PathVariable Long itemId) {
+        User user = getCurrentUser();
+        mediaService.removeFromWatchlist(user, MediaType.valueOf(type), itemId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/api/user/watchlist/{tmbdId}")
+    public ResponseEntity<BooleanDto> isMovieInWatchlist(@PathVariable Long tmbdId) {
+        User user = getCurrentUser();
+        boolean isInWatchList = mediaService.isMovieInWatchlist(user.getUserName(),tmbdId);
+        return ResponseEntity.ok(new BooleanDto(isInWatchList));
     }
 }

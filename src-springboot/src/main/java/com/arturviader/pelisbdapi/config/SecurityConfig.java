@@ -82,7 +82,9 @@ public class SecurityConfig {
                                 "/api/user/tv/{tvId}/episode",
                                 "/api/user/tv/{tvId}/season",
                                 "/api/user/tv/{tvId}",
-                                "/api/user/watchlist"
+                                "/api/user/watched/{tmdbId}",
+                                "/api/user/watchlist/{tmbdId}",
+                                "/api/user/watchlist/{type}/{itemId}"
                         ).hasAnyAuthority("ROLE_USER")
 
                         .anyRequest().authenticated()
