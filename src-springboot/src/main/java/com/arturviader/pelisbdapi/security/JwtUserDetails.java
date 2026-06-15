@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-// src/main/java/com/arturviader/pelisbdapi/security/JwtUserDetails.java
 
 public class JwtUserDetails implements UserDetails {
 
@@ -29,7 +28,7 @@ public class JwtUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return user.getUserName();
     }
 
     @Override

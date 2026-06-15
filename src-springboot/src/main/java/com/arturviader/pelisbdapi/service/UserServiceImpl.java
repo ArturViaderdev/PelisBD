@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public JwtResponse loginUser(LoginRequest dto) {
-        // 1. Busca el usuario por email
+        System.out.println("🔍 Buscando usuario service con: '" + dto.email() + "'");
         User user = userRepository.findByEmail(dto.email())
                 .orElseThrow(UserNotFound::new);
 
@@ -81,18 +81,18 @@ public class UserServiceImpl implements UserService{
             throw new EmailNotConfirmed();
         }
 
-        // 2. Verifica la contraseña usando PasswordEncoder
+
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
             throw new BadCredentialsException("Invalid password");
         }
 
-        // 3. Crea UserDetails manualmente
+
         UserDetails userDetails = new JwtUserDetails(user);
 
-        // 4. Genera token
+
         String jwt = jwtService.generateToken(userDetails);
 
-        // 5. Extrae role
+
         String role = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .findFirst()
@@ -132,8 +132,8 @@ public class UserServiceImpl implements UserService{
         if (authentication == null || authentication.getPrincipal() == null) {
             throw new NoUserAuthenticated();
         }
-        String email = authentication.getName();
-        return userRepository.findByEmail(email)
+        String username = authentication.getName();
+        return userRepository.findByUserName(username)
                 .orElseThrow(() -> new UserNotFound());
     }
 }

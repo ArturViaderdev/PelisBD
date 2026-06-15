@@ -16,6 +16,7 @@ public class TMDBServiceImpl implements TMDBService{
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    @Override
     public MovieDetailTMDB getMovieDetailWithTrailer(Long movieId) {
         MovieDetailTMDB detail = getMovieById(movieId); // Detalle básico
         if (detail == null) return null;
@@ -27,7 +28,8 @@ public class TMDBServiceImpl implements TMDBService{
         return detail;
     }
 
-    private MovieDetailTMDB getMovieById(Long id) {
+    @Override
+    public MovieDetailTMDB getMovieById(Long id) {
         String url = "https://api.themoviedb.org/3/movie/" + id +
                 "?api_key=" + apiKey + "&language=es-ES";
 
@@ -35,6 +37,7 @@ public class TMDBServiceImpl implements TMDBService{
         return response.getBody();
     }
 
+    @Override
     public MoviesResponseTMDB getPopularMovies(int page) {
         String url = "https://api.themoviedb.org/3/movie/popular" +
                 "?api_key=" + apiKey + "&language=es-ES&page=" + page;
@@ -46,6 +49,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public MoviesResponseTMDB getTrendingMovies(String timeWindow, int page) {
         if (!"day".equals(timeWindow) && !"week".equals(timeWindow)) {
             throw new IncorrectTimeWidow();
@@ -60,6 +64,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public SeriesResponseTMDB getPopularTvShows(int page) {
         String url = "https://api.themoviedb.org/3/tv/popular?api_key=" + apiKey + "&language=es-ES&page=" + page;
         try {
@@ -70,6 +75,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public SeriesResponseTMDB getTrendingTvShows(String timeWindow, int page) {
         if (!"day".equals(timeWindow) && !"week".equals(timeWindow)) {
             throw new IllegalArgumentException("timeWindow debe ser 'day' o 'week'");
@@ -84,6 +90,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public MoviesResponseTMDB searchMovie(String query, int page) {
         String url = "https://api.themoviedb.org/3/search/movie?query=" + query + "&page=" + page + "&api_key=" + apiKey;
         try {
@@ -96,6 +103,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public SeriesResponseTMDB searchTvShows(String query, int page) {
         String url = "https://api.themoviedb.org/3/search/tv?api_key=" + apiKey +
                 "&language=es-ES&query=" + query + "&page=" + page;
@@ -120,6 +128,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public SerieDetailTMDB getTvShowDetailWithTrailer(Long showId) {
         SerieDetailTMDB detail = getTvShowDetail(showId);
         if (detail == null) return null;
@@ -131,6 +140,7 @@ public class TMDBServiceImpl implements TMDBService{
         return detail;
     }
 
+    @Override
     public String getFirstTrailerKey(List<VideoTMDB> videos) {
         // Paso 1: Buscar trailer de YouTube con "Español" y "Trailer" en el nombre
         return videos.stream()
@@ -157,6 +167,7 @@ public class TMDBServiceImpl implements TMDBService{
                 });
     }
 
+    @Override
     public SeasonSerieDetailTMDB getSeasonDetail(Long tvId, Integer seasonNumber) {
         String tvName="";
         String url = "https://api.themoviedb.org/3/tv/" + tvId +
@@ -180,6 +191,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public EpisodeSerieDetailTMDB getEpisodeDetail(Long tvId, Integer seasonNumber, Integer episodeNumber) {
         String tvName="";
         String url = "https://api.themoviedb.org/3/tv/" + tvId +
@@ -204,6 +216,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public List<VideoTMDB> getMovieVideos(Long movieId) {
         String url = "https://api.themoviedb.org/3/movie/" + movieId + "/videos" +
                 "?api_key=" + apiKey + "&language=es-ES";
@@ -215,6 +228,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public List<VideoTMDB> getTvShowVideos(Long tvId) {
         String url = "https://api.themoviedb.org/3/tv/" + tvId + "/videos" +
                 "?api_key=" + apiKey + "&language=es-ES";
@@ -226,6 +240,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public GenreDetailMoviesTMDB getGenreDetail(Long genreId, int page, int limit) {
         // Primero, obtener el nombre del género
         String url = "https://api.themoviedb.org/3/genre/movie/list?api_key=" + apiKey + "&language=es-ES";
@@ -246,6 +261,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public GenreDetailSeriesTMDB getGenreDetailSeries(Long genreId, int page, int limit) {
         // Primero, obtener el nombre del género
         String url = "https://api.themoviedb.org/3/genre/tv/list?api_key=" + apiKey + "&language=es-ES";
@@ -299,6 +315,7 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
+    @Override
     public List<Genre> getAllGenres() {
         String movieUrl = "https://api.themoviedb.org/3/genre/movie/list?api_key=" + apiKey + "&language=es-ES";
         List<Genre> movieGenres = getGenresFromUrl(movieUrl);
@@ -312,6 +329,7 @@ public class TMDBServiceImpl implements TMDBService{
         return movieGenres;
     }
 
+    @Override
     public List<Genre> getAllTVGenres(){
         String tvUrl = "https://api.themoviedb.org/3/genre/tv/list?api_key=" + apiKey + "&language=es-ES";
         List<Genre> tvGenres = getGenresFromUrl(tvUrl);

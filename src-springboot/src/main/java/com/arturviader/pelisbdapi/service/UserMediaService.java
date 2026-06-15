@@ -23,5 +23,6 @@ public interface UserMediaService{
     void addToWatched(User user, MediaType type, Long itemId);
     void removeFromWatched(User user, MediaType type, Long itemId);
     List<WatchedItemDto> getWatchedList(User user);
+    boolean isMovieWatched(Long id, String username);
 }
 

@@ -13,7 +13,7 @@ public class MovieDetailTMDB extends MovieTMDB {
     private List<VideoTMDB> videos;
     private String trailerKey;
 
-    public MovieDetailTMDB(int id, String title, String release_date, String overview, String poster_path, Double voteAverage, String backdropPath, String originalLanguage, List<Genre> genres, List<VideoTMDB> videos, String trailerKey) {
+    public MovieDetailTMDB(Long id, String title, String release_date, String overview, String poster_path, Double voteAverage, String backdropPath, String originalLanguage, List<Genre> genres, List<VideoTMDB> videos, String trailerKey) {
         super(id, title, release_date, overview, poster_path);
         this.voteAverage = voteAverage;
         this.backdropPath = backdropPath;

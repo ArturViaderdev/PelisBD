@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-
 public class UserMediaController {
 
     @Autowired
@@ -38,11 +37,20 @@ public class UserMediaController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/api/user/watchlist")
+    @GetMapping("/api/user/watched")
     public ResponseEntity<List<WatchedItemDto>> getWatchedList() {
         User user = getCurrentUser();
         List<WatchedItemDto> list = mediaService.getWatchedList(user);
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/watched/{tmdbId}")
+    public ResponseEntity<Boolean> isMovieWatched(
+            @PathVariable Long tmdbId)
+    {
+        User user = getCurrentUser();
+        boolean isWatched = mediaService.isMovieWatched(tmdbId, user.getUserName());
+        return ResponseEntity.ok(isWatched);
     }
 
     public User getCurrentUser() {
