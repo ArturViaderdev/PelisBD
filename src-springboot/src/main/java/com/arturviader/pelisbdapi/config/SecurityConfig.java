@@ -78,8 +78,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/user/watched",
                                 "/api/user/watched/{type}/{itemId}",
+                                "/api/user/watched/status/{type}/{tmbdId}",
                                 "/api/user/watchlist",
                                 "/api/user/watchlist/{type}/{itemId}",
+                                "/api/user/watchlist/status/{type}/{tmbdId}",
                                 "/api/user/tv/{tvId}/episode",
                                 "/api/user/tv/{tvId}/season",
                                 "/api/user/tv/{tvId}",

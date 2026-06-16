@@ -26,6 +26,21 @@ export default function TVDetail() {
         setTVShow(tvRes.data);
 
         if (user) {
+           try {
+            const watchedRes = await userService.isMovieWatched('tv',id);
+            setIsWatched(watchedRes.data.value);
+          } catch (err) {
+            console.error('Error checking watched status:', err);
+            setIsWatched(false);
+          }
+          try {
+            const watchedRes = await userService.isMovieInWatchList('tv',id);
+            setIsWatchlisted(watchedRes.data.value);
+          } catch (err) {
+              console.error('Error checking watchlisted status:', err);
+              setIsWatchlisted(false);
+          }
+          
           const [ratingsRes, commentsRes] = await Promise.all([
             reviewService.getItemRatings('tv', id),
             reviewService.getComments('tv', id, false),

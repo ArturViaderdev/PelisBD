@@ -56,7 +56,7 @@ public class TMDBServiceImpl implements TMDBService{
             ResponseEntity<MoviesResponseTMDB> response = restTemplate.getForEntity(url, MoviesResponseTMDB.class);
             if(user!=null)
             {
-                addWatchStausToMovies(response.getBody().results(),user);
+                addWatchStatusToMovies(response.getBody().results(),user);
             }
 
             return response.getBody();
@@ -65,10 +65,17 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
-    private void addWatchStausToMovies(List<MovieTMDB> movies, User user){
+    private void addWatchStatusToMovies(List<MovieTMDB> movies, User user){
         for(MovieTMDB movie: movies){
             movie.setWatched(userMediaService.isMovieWatched(movie.getId(),user.getUserName(), MediaType.movie));
             movie.setWatchListed(userMediaService.isMovieInWatchlist(user.getUserName(),movie.getId(),MediaType.movie));
+        }
+    }
+
+    private void addWatchStatusToTv(List<SerieTMDB> series, User user){
+        for(SerieTMDB serie: series){
+            serie.setWatched(userMediaService.isMovieWatched(serie.getId(),user.getUserName(), MediaType.tv));
+            serie.setWatchListed(userMediaService.isMovieInWatchlist(user.getUserName(),serie.getId(),MediaType.tv));
         }
     }
 
@@ -83,7 +90,7 @@ public class TMDBServiceImpl implements TMDBService{
             ResponseEntity<MoviesResponseTMDB> response = restTemplate.getForEntity(url, MoviesResponseTMDB.class);
             if(user!=null)
             {
-                addWatchStausToMovies(response.getBody().results(),user);
+                addWatchStatusToMovies(response.getBody().results(),user);
             }
             return response.getBody();
         } catch (Exception e) {
@@ -92,10 +99,15 @@ public class TMDBServiceImpl implements TMDBService{
     }
 
     @Override
-    public SeriesResponseTMDB getPopularTvShows(int page) {
+    public SeriesResponseTMDB getPopularTvShows(int page, User user) {
         String url = "https://api.themoviedb.org/3/tv/popular?api_key=" + apiKey + "&language=es-ES&page=" + page;
         try {
             ResponseEntity<SeriesResponseTMDB> response = restTemplate.getForEntity(url, SeriesResponseTMDB.class);
+            if(user!=null)
+            {
+                addWatchStatusToTv(response.getBody().results(),user);
+            }
+
             return response.getBody();
         } catch (Exception e) {
             return null;
@@ -103,7 +115,7 @@ public class TMDBServiceImpl implements TMDBService{
     }
 
     @Override
-    public SeriesResponseTMDB getTrendingTvShows(String timeWindow, int page) {
+    public SeriesResponseTMDB getTrendingTvShows(String timeWindow, int page,User user) {
         if (!"day".equals(timeWindow) && !"week".equals(timeWindow)) {
             throw new IllegalArgumentException("timeWindow debe ser 'day' o 'week'");
         }
@@ -111,6 +123,10 @@ public class TMDBServiceImpl implements TMDBService{
                 "?api_key=" + apiKey + "&language=es-ES&page=" + page;
         try {
             ResponseEntity<SeriesResponseTMDB> response = restTemplate.getForEntity(url, SeriesResponseTMDB.class);
+            if(user!=null)
+            {
+                addWatchStatusToTv(response.getBody().results(),user);
+            }
             return response.getBody();
         } catch (Exception e) {
             return null;
@@ -124,7 +140,7 @@ public class TMDBServiceImpl implements TMDBService{
             ResponseEntity<MoviesResponseTMDB> response = restTemplate.getForEntity(url, MoviesResponseTMDB.class);
             if(user!=null)
             {
-                addWatchStausToMovies(response.getBody().results(),user);
+                addWatchStatusToMovies(response.getBody().results(),user);
             }
             return response.getBody();
         }
@@ -135,11 +151,15 @@ public class TMDBServiceImpl implements TMDBService{
     }
 
     @Override
-    public SeriesResponseTMDB searchTvShows(String query, int page) {
+    public SeriesResponseTMDB searchTvShows(String query, int page, User user) {
         String url = "https://api.themoviedb.org/3/search/tv?api_key=" + apiKey +
                 "&language=es-ES&query=" + query + "&page=" + page;
         try {
             ResponseEntity<SeriesResponseTMDB> response = restTemplate.getForEntity(url, SeriesResponseTMDB.class);
+            if(user!=null)
+            {
+                addWatchStatusToTv(response.getBody().results(),user);
+            }
             return response.getBody();
         }
         catch(Exception ex)
@@ -288,7 +308,7 @@ public class TMDBServiceImpl implements TMDBService{
             GenreDetailMoviesTMDB movies = getMoviesByGenre(genreId, page, limit,genre.name());
             if(user!=null)
             {
-                addWatchStausToMovies(movies.getResults(),user);
+                addWatchStatusToMovies(movies.getResults(),user);
             }
 
             return movies;
@@ -298,7 +318,7 @@ public class TMDBServiceImpl implements TMDBService{
     }
 
     @Override
-    public GenreDetailSeriesTMDB getGenreDetailSeries(Long genreId, int page, int limit) {
+    public GenreDetailSeriesTMDB getGenreDetailSeries(Long genreId, int page, int limit, User user) {
         // Primero, obtener el nombre del género
         String url = "https://api.themoviedb.org/3/genre/tv/list?api_key=" + apiKey + "&language=es-ES";
         try {
@@ -311,6 +331,10 @@ public class TMDBServiceImpl implements TMDBService{
 
             if (genre == null) return null;
             GenreDetailSeriesTMDB series = getSeriesByGenre(genreId, page, limit,genre.name());
+            if(user!=null)
+            {
+                addWatchStatusToTv(series.getResults(),user);
+            }
             return series;
         } catch (Exception e) {
             return null;

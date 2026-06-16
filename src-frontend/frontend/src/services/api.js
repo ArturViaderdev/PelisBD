@@ -95,16 +95,16 @@ export const userService = {
     api.delete(`/user/watched/${type}/${itemId}`),
   getWatchedList: () =>
     api.get('/user/watched'),
-  isMovieWatched: (tmbdId) =>
-    api.get(`/user/watched/${tmbdId}`),
+  isMovieWatched: (type,tmbdId) =>
+    api.get(`/user/watched/status/${type}/${tmbdId}`),
   addToWatchlist: (type, itemId) =>
     api.post('/user/watchlist', { type, itemId }),
   removeFromWatchlist: (type, itemId) =>
     api.delete(`/user/watchlist/${type}/${itemId}`),
   getWatchlist: () =>
     api.get('/user/watchlist'),
-  isMovieInWatchList: (tmdbId) =>
-    api.get(`/user/watchlist/${tmdbId}`),
+  isMovieInWatchList: (type,tmdbId) =>
+    api.get(`/user/watchlist/status/${type}/${tmdbId}`),
   markEpisode: (tvId, season, episode, watched = true) =>
     api.post(`/user/tv/${tvId}/episode`, { season, episode, watched }),
   markSeason: (tvId, season, watched = true) =>

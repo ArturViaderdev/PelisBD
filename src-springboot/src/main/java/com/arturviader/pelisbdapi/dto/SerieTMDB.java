@@ -32,6 +32,9 @@ public class SerieTMDB {
     @JsonProperty("popularity")
     private Double popularity;
 
+    private boolean isWatchListed;
+    private boolean isWatched;
+
     public SerieTMDB(Long id, String name, String originalName, String overview, String posterPath, String firstAirDate, Double voteAverage, Integer voteCount, Double popularity) {
         this.id = id;
         this.name = name;
@@ -46,6 +49,22 @@ public class SerieTMDB {
 
     public Long getId() {
         return id;
+    }
+
+    public boolean isWatchListed() {
+        return isWatchListed;
+    }
+
+    public void setWatchListed(boolean watchListed) {
+        isWatchListed = watchListed;
+    }
+
+    public boolean isWatched() {
+        return isWatched;
+    }
+
+    public void setWatched(boolean watched) {
+        isWatched = watched;
     }
 
     public void setId(Long id) {

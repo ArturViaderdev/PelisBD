@@ -10,10 +10,10 @@ public interface TMDBService {
     MovieDetailTMDB getMovieDetailWithTrailer(Long movieId);
     MoviesResponseTMDB getPopularMovies(int page, User user);
     MoviesResponseTMDB getTrendingMovies(String timeWindow, int page, User user);
-    SeriesResponseTMDB getPopularTvShows(int page);
-    SeriesResponseTMDB getTrendingTvShows(String timeWindow, int page);
+    SeriesResponseTMDB getPopularTvShows(int page, User user);
+    SeriesResponseTMDB getTrendingTvShows(String timeWindow, int page, User user);
     MoviesResponseTMDB searchMovie(String query, int page,User user);
-    SeriesResponseTMDB searchTvShows(String query, int page);
+    SeriesResponseTMDB searchTvShows(String query, int page, User user);
     SerieDetailTMDB getTvShowDetailWithTrailer(Long showId);
     String getFirstTrailerKey(List<VideoTMDB> videos);
     SeasonSerieDetailTMDB getSeasonDetail(Long tvId, Integer seasonNumber);
@@ -21,7 +21,7 @@ public interface TMDBService {
     List<VideoTMDB> getMovieVideos(Long movieId);
     List<VideoTMDB> getTvShowVideos(Long tvId);
     GenreDetailMoviesTMDB getGenreDetail(Long genreId, int page, int limit, User user);
-    GenreDetailSeriesTMDB getGenreDetailSeries(Long genreId, int page, int limit);
+    GenreDetailSeriesTMDB getGenreDetailSeries(Long genreId, int page, int limit, User user);
     List<Genre> getAllGenres();
     List<Genre> getAllTVGenres();
     MovieDetailTMDB getMovieById(Long id);

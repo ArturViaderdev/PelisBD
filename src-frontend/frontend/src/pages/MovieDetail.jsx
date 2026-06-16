@@ -26,14 +26,14 @@ export default function MovieDetail() {
 
         if (user) {
          try {
-            const watchedRes = await userService.isMovieWatched(id);
+            const watchedRes = await userService.isMovieWatched('movie',id);
             setIsWatched(watchedRes.data.value);
         } catch (err) {
           console.error('Error checking watched status:', err);
           setIsWatched(false);
         }
         try {
-            const watchedRes = await userService.isMovieInWatchList(id);
+            const watchedRes = await userService.isMovieInWatchList('movie',id);
             setIsWatchlisted(watchedRes.data.value);
         } catch (err) {
             console.error('Error checking watchlisted status:', err);

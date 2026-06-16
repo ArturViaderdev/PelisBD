@@ -64,7 +64,8 @@ public class TMDBController {
     @GetMapping("/api/tv/popular")
     public ResponseEntity<SeriesResponseTMDB> getPopularTvShows(
             @RequestParam(defaultValue = "1") int page) {
-        SeriesResponseTMDB shows = tmdbService.getPopularTvShows(page);
+        User user = getCurrentUser();
+        SeriesResponseTMDB shows = tmdbService.getPopularTvShows(page,user);
         return ResponseEntity.ok(shows);
     }
 
@@ -72,7 +73,8 @@ public class TMDBController {
     public ResponseEntity<SeriesResponseTMDB> getTrendingTvShows(
             @RequestParam(defaultValue = "day") String timeWindow,
             @RequestParam(defaultValue = "1") int page) {
-        SeriesResponseTMDB shows = tmdbService.getTrendingTvShows(timeWindow, page);
+        User user = getCurrentUser();
+        SeriesResponseTMDB shows = tmdbService.getTrendingTvShows(timeWindow, page,user);
         return ResponseEntity.ok(shows);
     }
 
@@ -80,7 +82,8 @@ public class TMDBController {
     public ResponseEntity<SeriesResponseTMDB> searchTvShows(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int page) {
-        return ResponseEntity.ok(tmdbService.searchTvShows(query, page));
+        User user = getCurrentUser();
+        return ResponseEntity.ok(tmdbService.searchTvShows(query, page,user));
     }
 
     @GetMapping("/api/search/multi")
@@ -90,7 +93,7 @@ public class TMDBController {
     {
         User user = getCurrentUser();
         MoviesResponseTMDB results = tmdbService.searchMovie(query,1, user);
-        SeriesResponseTMDB resultstv = tmdbService.searchTvShows(query, 1);
+        SeriesResponseTMDB resultstv = tmdbService.searchTvShows(query, 1,user);
         SearchResultsMoviesAndTV all = new SearchResultsMoviesAndTV(results.results(),resultstv.results());
         return ResponseEntity.ok(all);
     }
@@ -157,8 +160,8 @@ public class TMDBController {
             @PathVariable Long id,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int limit) {
-
-        GenreDetailSeriesTMDB detail = tmdbService.getGenreDetailSeries(id, page, limit);
+        User user = getCurrentUser();
+        GenreDetailSeriesTMDB detail = tmdbService.getGenreDetailSeries(id, page, limit,user);
         if (detail == null) {
             return ResponseEntity.notFound().build();
         }
