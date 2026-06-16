@@ -25,4 +25,5 @@ public interface TMDBService {
     List<Genre> getAllGenres();
     List<Genre> getAllTVGenres();
     MovieDetailTMDB getMovieById(Long id);
+    SerieDetailTMDB getTvShowDetail(Long id);
 }

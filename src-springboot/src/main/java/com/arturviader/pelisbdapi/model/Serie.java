@@ -6,9 +6,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "movies")
-public class Movie {
-
+@Table(name = "series")
+public class Serie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -65,26 +64,11 @@ public class Movie {
     public Integer getVoteCount() { return voteCount; }
     public void setVoteCount(Integer voteCount) { this.voteCount = voteCount; }
 
-
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-
-    public Movie() {
-    }
-
-    public Movie(Long id, Long tmdbId, String title, String overview, String posterPath, LocalDate releaseDate, Double voteAverage, Integer voteCount) {
-        this.id = id;
-        this.tmdbId = tmdbId;
-        this.title = title;
-        this.overview = overview;
-        this.posterPath = posterPath;
-        this.releaseDate = releaseDate;
-        this.voteAverage = voteAverage;
-        this.voteCount = voteCount;
-    }
 
     @PrePersist
     protected void onCreate() {

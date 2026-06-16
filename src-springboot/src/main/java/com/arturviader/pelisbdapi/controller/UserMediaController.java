@@ -48,7 +48,7 @@ public class UserMediaController {
             @PathVariable Long tmdbId)
     {
         User user = getCurrentUser();
-        boolean isWatched = mediaService.isMovieWatched(tmdbId, user.getUserName());
+        boolean isWatched = mediaService.isMovieWatched(tmdbId, user.getUserName(),MediaType.movie);
         return ResponseEntity.ok(new BooleanDto(isWatched));
     }
 
@@ -81,7 +81,7 @@ public class UserMediaController {
     @GetMapping("/api/user/watchlist/{tmbdId}")
     public ResponseEntity<BooleanDto> isMovieInWatchlist(@PathVariable Long tmbdId) {
         User user = getCurrentUser();
-        boolean isInWatchList = mediaService.isMovieInWatchlist(user.getUserName(),tmbdId);
+        boolean isInWatchList = mediaService.isMovieInWatchlist(user.getUserName(),tmbdId,MediaType.movie);
         return ResponseEntity.ok(new BooleanDto(isInWatchList));
     }
 }

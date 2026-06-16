@@ -11,6 +11,8 @@ public record WatchedItemDto(
         @JsonProperty("title") String title,
         @JsonProperty("poster_path") String posterPath,
         @JsonProperty("release_date") String releaseDate, // ✅ yyyy-MM-dd
-        @JsonProperty("media_type") String mediaType
+        @JsonProperty("media_type") String mediaType,
+        @JsonProperty("watchListed") boolean isWatchListed,
+        @JsonProperty("watched") boolean isWatched
 ) {
 }

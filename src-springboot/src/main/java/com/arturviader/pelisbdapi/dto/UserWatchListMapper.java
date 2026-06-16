@@ -1,9 +1,9 @@
 package com.arturviader.pelisbdapi.dto;
 
-import com.arturviader.pelisbdapi.model.Movie;
-import com.arturviader.pelisbdapi.model.UserWatchedItem;
-import com.arturviader.pelisbdapi.model.UserWatchlistItem;
+import com.arturviader.pelisbdapi.model.*;
 import com.arturviader.pelisbdapi.service.MovieService;
+import com.arturviader.pelisbdapi.service.TvService;
+import com.arturviader.pelisbdapi.service.UserMediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,19 +14,44 @@ public class UserWatchListMapper {
     @Autowired
     private MovieService movieService;
 
-    public WatchlistItemDto toDtoWithMovieData(UserWatchlistItem item) {
+    @Autowired
+    private TvService tvService;
+
+    public WatchlistItemDto toDtoWithMovieData(UserWatchlistItem item, boolean watched) {
         String mediaType = item.getType().name();
-        var movieOpt = movieService.findById(item.getItemId(), mediaType);
-        return new WatchlistItemDto(
-                movieOpt.map(Movie::getTmdbId).orElse(null), // ✅ id = tmdbId
-                item.getType().name(),
-                item.getAddedAt(),
-                movieOpt.map(Movie::getTitle).orElse("Unknown"),
-                movieOpt.map(Movie::getPosterPath).orElse("/no-poster.jpg"),
-                movieOpt.map(Movie::getReleaseDate)
-                        .map(date -> date.format(DateTimeFormatter.ISO_LOCAL_DATE))
-                        .orElse(null), // ✅ release_date
-                mediaType // ✅ media_type
-        );
+        if (item.getType().equals(MediaType.movie)) {
+            var movieOpt = movieService.findById(item.getItemId());
+            return new WatchlistItemDto(
+                    movieOpt.map(Movie::getTmdbId).orElse(null),
+                    item.getType().name(),
+                    item.getAddedAt(),
+                    movieOpt.map(Movie::getTitle).orElse("Unknown"),
+                    movieOpt.map(Movie::getPosterPath).orElse("/no-poster.jpg"),
+                    movieOpt.map(Movie::getReleaseDate)
+                            .map(date -> date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+                            .orElse(null), // ✅ release_date
+                    mediaType,
+                    true,
+                    watched
+            );
+
+        }
+        else
+        {
+            var tvOpt = tvService.findById(item.getItemId());
+            return new WatchlistItemDto(
+                    tvOpt.map(Serie::getTmdbId).orElse(null),
+                    item.getType().name(),
+                    item.getAddedAt(),
+                    tvOpt.map(Serie::getTitle).orElse("Unknown"),
+                    tvOpt.map(Serie::getPosterPath).orElse("/no-poster.jpg"),
+                    tvOpt.map(Serie::getReleaseDate)
+                            .map(date -> date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+                            .orElse(null), // ✅ release_date
+                    mediaType,
+                    true,
+                    watched
+            );
+        }
     }
 }

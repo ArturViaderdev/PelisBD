@@ -2,6 +2,7 @@ package com.arturviader.pelisbdapi.service;
 
 import com.arturviader.pelisbdapi.dto.*;
 import com.arturviader.pelisbdapi.exception.IncorrectTimeWidow;
+import com.arturviader.pelisbdapi.model.MediaType;
 import com.arturviader.pelisbdapi.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,8 +67,8 @@ public class TMDBServiceImpl implements TMDBService{
 
     private void addWatchStausToMovies(List<MovieTMDB> movies, User user){
         for(MovieTMDB movie: movies){
-            movie.setWatched(userMediaService.isMovieWatched(movie.getId(),user.getUserName()));
-            movie.setWatchListed(userMediaService.isMovieInWatchlist(user.getUserName(),movie.getId()));
+            movie.setWatched(userMediaService.isMovieWatched(movie.getId(),user.getUserName(), MediaType.movie));
+            movie.setWatchListed(userMediaService.isMovieInWatchlist(user.getUserName(),movie.getId(),MediaType.movie));
         }
     }
 
@@ -147,7 +148,8 @@ public class TMDBServiceImpl implements TMDBService{
         }
     }
 
-    private SerieDetailTMDB getTvShowDetail(Long id) {
+    @Override
+    public SerieDetailTMDB getTvShowDetail(Long id) {
         String url = "https://api.themoviedb.org/3/tv/" + id +
                 "?api_key=" + apiKey + "&language=es-ES";
         try {

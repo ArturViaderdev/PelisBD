@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +37,9 @@ public class UserMediaServiceImpl implements UserMediaService {
     private MovieService movieService;
 
     @Autowired
+    private TvService tvService;
+
+    @Autowired
     private TMDBService tmdbService;
 
     @Autowired
@@ -53,8 +57,14 @@ public class UserMediaServiceImpl implements UserMediaService {
         System.out.println(user.getEmail());
         UserWatchedItem item = watchedRepo.findByUserAndTypeAndItemId(user, type, itemId)
                 .orElse(new UserWatchedItem());
-
-        movieService.saveIfNotExists(tmdbService.getMovieById(itemId),"movie");
+        if(type.equals(MediaType.movie))
+        {
+            movieService.saveIfNotExists(tmdbService.getMovieById(itemId),"movie");
+        }
+        else
+        {
+             tvService.saveIfNotExists(tmdbService.getTvShowDetail(itemId),"tv");
+        }
         item.setUser(user);
         item.setType(type);
         item.setItemId(itemId);
@@ -71,13 +81,21 @@ public class UserMediaServiceImpl implements UserMediaService {
 
     @Override
     public List<WatchedItemDto> getWatchedList(User user) {
-        return watchedRepo.findByUser(user).stream()
-                .map(userWatchedMapper::toDtoWithMovieData) // ✅ Ahora funciona
+        List<UserWatchedItem> list = watchedRepo.findByUser(user);
+        String userId = user.getUserName();
+
+        List<UserWatchedItem> watchedItems = watchedRepo.findByUser(user);
+
+        return watchedItems.stream()
+                .map(item -> {
+                    boolean isWatchListed = isMovieInWatchlist(userId, item.getItemId(), item.getType());
+                    return userWatchedMapper.toDtoWithMovieData(item, isWatchListed);
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public boolean isMovieWatched(Long tmdbId, String userName) {
+    public boolean isMovieWatched(Long tmdbId, String userName, MediaType mediaType) {
         Optional<User> userOpt = userRepository.findByUserName(userName);
 
         if (userOpt.isEmpty()) {
@@ -86,7 +104,7 @@ public class UserMediaServiceImpl implements UserMediaService {
 
         User user = userOpt.get();
 
-        return watchedRepo.existsByUserAndItemIdAndType(user, tmdbId, MediaType.movie);
+        return watchedRepo.existsByUserAndItemIdAndType(user, tmdbId, mediaType);
     }
 
     @Override
@@ -109,20 +127,29 @@ public class UserMediaServiceImpl implements UserMediaService {
     }
 
     @Override
-    public boolean isMovieInWatchlist(String userId, Long tmdbId) {
+    public boolean isMovieInWatchlist(String userId, Long tmdbId,MediaType mediaType) {
         Optional<User> userOpt = userRepository.findByUserName(userId);
         if (userOpt.isEmpty()) {
             return false;
         }
         User user = userOpt.get();
-        return watchlistRepository.existsByUserAndItemIdAndType(user, tmdbId, MediaType.movie);
+        return watchlistRepository.existsByUserAndItemIdAndType(user, tmdbId, mediaType);
     }
 
     @Override
     public List<WatchlistItemDto> getWatchlist(User user) {
-        return watchlistRepository.findByUser(user).stream()
-                .map(userWatchListMapper::toDtoWithMovieData) // ✅ Ahora funciona
+        List<UserWatchlistItem> list = watchlistRepository.findByUser(user);
+        String userId = user.getUserName();
+
+        List<UserWatchlistItem> watchListItems = watchlistRepository.findByUser(user);
+
+        return watchListItems.stream()
+                .map(item -> {
+                    boolean isWatched = isMovieWatched(item.getItemId(),userId, item.getType());
+                    return userWatchListMapper.toDtoWithMovieData(item, isWatched);
+                })
                 .collect(Collectors.toList());
+
     }
 
 

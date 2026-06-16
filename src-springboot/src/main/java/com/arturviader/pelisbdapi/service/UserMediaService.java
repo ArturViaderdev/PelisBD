@@ -24,10 +24,10 @@ public interface UserMediaService{
     void addToWatched(User user, MediaType type, Long itemId);
     void removeFromWatched(User user, MediaType type, Long itemId);
     List<WatchedItemDto> getWatchedList(User user);
-    boolean isMovieWatched(Long id, String username);
+    boolean isMovieWatched(Long id, String username,MediaType mediaType);
     void addToWatchlist(User user, MediaType type, Long tmdbId);
     void removeFromWatchlist(User user, MediaType type, Long tmdbId);
-    boolean isMovieInWatchlist(String userId, Long tmdbId);
+    boolean isMovieInWatchlist(String userId, Long tmdbId, MediaType mediaType);
     List<WatchlistItemDto> getWatchlist(User user);
 }
 
