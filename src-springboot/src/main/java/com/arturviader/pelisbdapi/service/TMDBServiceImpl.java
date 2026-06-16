@@ -2,7 +2,10 @@ package com.arturviader.pelisbdapi.service;
 
 import com.arturviader.pelisbdapi.dto.*;
 import com.arturviader.pelisbdapi.exception.IncorrectTimeWidow;
+import com.arturviader.pelisbdapi.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -15,6 +18,13 @@ public class TMDBServiceImpl implements TMDBService{
     private String apiKey;
 
     private final RestTemplate restTemplate = new RestTemplate();
+
+    @Autowired
+    @Lazy
+    private UserMediaService userMediaService;
+
+
+
 
     @Override
     public MovieDetailTMDB getMovieDetailWithTrailer(Long movieId) {
@@ -38,19 +48,31 @@ public class TMDBServiceImpl implements TMDBService{
     }
 
     @Override
-    public MoviesResponseTMDB getPopularMovies(int page) {
+    public MoviesResponseTMDB getPopularMovies(int page, User user) {
         String url = "https://api.themoviedb.org/3/movie/popular" +
                 "?api_key=" + apiKey + "&language=es-ES&page=" + page;
         try {
             ResponseEntity<MoviesResponseTMDB> response = restTemplate.getForEntity(url, MoviesResponseTMDB.class);
+            if(user!=null)
+            {
+                addWatchStausToMovies(response.getBody().results(),user);
+            }
+
             return response.getBody();
         } catch (Exception e) {
             return null;
         }
     }
 
+    private void addWatchStausToMovies(List<MovieTMDB> movies, User user){
+        for(MovieTMDB movie: movies){
+            movie.setWatched(userMediaService.isMovieWatched(movie.getId(),user.getUserName()));
+            movie.setWatchListed(userMediaService.isMovieInWatchlist(user.getUserName(),movie.getId()));
+        }
+    }
+
     @Override
-    public MoviesResponseTMDB getTrendingMovies(String timeWindow, int page) {
+    public MoviesResponseTMDB getTrendingMovies(String timeWindow, int page, User user) {
         if (!"day".equals(timeWindow) && !"week".equals(timeWindow)) {
             throw new IncorrectTimeWidow();
         }
@@ -58,6 +80,10 @@ public class TMDBServiceImpl implements TMDBService{
                 "?api_key=" + apiKey + "&language=es-ES&page=1";
         try {
             ResponseEntity<MoviesResponseTMDB> response = restTemplate.getForEntity(url, MoviesResponseTMDB.class);
+            if(user!=null)
+            {
+                addWatchStausToMovies(response.getBody().results(),user);
+            }
             return response.getBody();
         } catch (Exception e) {
             return null;
@@ -91,10 +117,14 @@ public class TMDBServiceImpl implements TMDBService{
     }
 
     @Override
-    public MoviesResponseTMDB searchMovie(String query, int page) {
+    public MoviesResponseTMDB searchMovie(String query, int page, User user) {
         String url = "https://api.themoviedb.org/3/search/movie?query=" + query + "&page=" + page + "&api_key=" + apiKey;
         try {
             ResponseEntity<MoviesResponseTMDB> response = restTemplate.getForEntity(url, MoviesResponseTMDB.class);
+            if(user!=null)
+            {
+                addWatchStausToMovies(response.getBody().results(),user);
+            }
             return response.getBody();
         }
         catch(Exception ex)
@@ -241,7 +271,7 @@ public class TMDBServiceImpl implements TMDBService{
     }
 
     @Override
-    public GenreDetailMoviesTMDB getGenreDetail(Long genreId, int page, int limit) {
+    public GenreDetailMoviesTMDB getGenreDetail(Long genreId, int page, int limit, User user) {
         // Primero, obtener el nombre del género
         String url = "https://api.themoviedb.org/3/genre/movie/list?api_key=" + apiKey + "&language=es-ES";
         try {
@@ -254,6 +284,10 @@ public class TMDBServiceImpl implements TMDBService{
 
             if (genre == null) return null;
             GenreDetailMoviesTMDB movies = getMoviesByGenre(genreId, page, limit,genre.name());
+            if(user!=null)
+            {
+                addWatchStausToMovies(movies.getResults(),user);
+            }
 
             return movies;
         } catch (Exception e) {

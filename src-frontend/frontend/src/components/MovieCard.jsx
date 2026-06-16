@@ -5,8 +5,8 @@ import { useAuthStore } from '../stores/authStore';
 import { userService } from '../services/api'; 
 
 export default function MovieCard({ item, type = 'movie', onWatchlistToggle, onWatchedToggle }) {
-  const [isWatchlisted, setIsWatchlisted] = useState(item.isWatchlisted || false);
-  const [isWatched, setIsWatched] = useState(item.isWatched || false);
+  const [isWatchlisted, setIsWatchlisted] = useState(item.watchListed || false);
+  const [isWatched, setIsWatched] = useState(item.watched || false);
 
   const user = useAuthStore(state => state.user); // ✅ Obtener el usuario
 
