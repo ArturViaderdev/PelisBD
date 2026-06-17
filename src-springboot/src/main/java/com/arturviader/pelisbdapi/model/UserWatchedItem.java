@@ -27,8 +27,6 @@ public class UserWatchedItem {
     @Column(name = "watched_at")
     private LocalDateTime watchedAt;
 
-
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -45,5 +43,6 @@ public class UserWatchedItem {
     public void setWatchedAt(LocalDateTime watchedAt) { this.watchedAt = watchedAt; }
 
     public UserWatchedItem () {
+        watchedAt = LocalDateTime.now();
     }
 }

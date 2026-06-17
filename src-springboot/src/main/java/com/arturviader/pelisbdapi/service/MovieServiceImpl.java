@@ -30,7 +30,7 @@ public class MovieServiceImpl implements MovieService {
                     Movie movie = new Movie();
                     movie.setTmdbId(tmdbMovie.getId());
                     movie.setTitle(tmdbMovie.getTitle());
-                    movie.setOverview(tmdbMovie.getOverview());
+
                     movie.setPosterPath(tmdbMovie.getPoster_path());
                     movie.setReleaseDate(LocalDate.parse(tmdbMovie.getRelease_date(), DateTimeFormatter.ISO_LOCAL_DATE));
 
@@ -40,13 +40,11 @@ public class MovieServiceImpl implements MovieService {
 
     private boolean needsUpdate(Movie movie, MovieTMDB tmdbMovie) {
         return !movie.getTitle().equals(tmdbMovie.getTitle())
-                || !movie.getOverview().equals(tmdbMovie.getOverview())
                 || !movie.getPosterPath().equals(tmdbMovie.getPoster_path());
     }
 
     private void updateMovie(Movie movie, MovieTMDB tmdbMovie) {
         movie.setTitle(tmdbMovie.getTitle());
-        movie.setOverview(tmdbMovie.getOverview());
         movie.setPosterPath(tmdbMovie.getPoster_path());
         movie.setReleaseDate(LocalDate.parse(tmdbMovie.getRelease_date(), DateTimeFormatter.ISO_LOCAL_DATE));
     }

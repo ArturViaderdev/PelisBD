@@ -93,16 +93,20 @@ export const userService = {
     api.post('/user/watched', { type, itemId }),
   removeFromWatched: (type, itemId) =>
     api.delete(`/user/watched/${type}/${itemId}`),
-  getWatchedList: () =>
-    api.get('/user/watched'),
+  getWatchedList: (page = 1, size = 12, sort = 'recent') =>
+    api.get('/user/watched', {
+      params: { page, size, sort }
+    }),
   isMovieWatched: (type,tmbdId) =>
     api.get(`/user/watched/status/${type}/${tmbdId}`),
   addToWatchlist: (type, itemId) =>
     api.post('/user/watchlist', { type, itemId }),
   removeFromWatchlist: (type, itemId) =>
     api.delete(`/user/watchlist/${type}/${itemId}`),
-  getWatchlist: () =>
-    api.get('/user/watchlist'),
+  getWatchlist: (page = 0, size = 12, sort = 'recent') =>
+    api.get('/user/watchlist', {
+      params: { page, size, sort }
+    }),
   isMovieInWatchList: (type,tmdbId) =>
     api.get(`/user/watchlist/status/${type}/${tmdbId}`),
   markEpisode: (tvId, season, episode, watched = true) =>

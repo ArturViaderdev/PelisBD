@@ -19,9 +19,6 @@ public class Movie {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
-    private String overview;
-
     @Column(name = "poster_path")
     private String posterPath;
 
@@ -50,9 +47,6 @@ public class Movie {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    public String getOverview() { return overview; }
-    public void setOverview(String overview) { this.overview = overview; }
-
     public String getPosterPath() { return posterPath; }
     public void setPosterPath(String posterPath) { this.posterPath = posterPath; }
 
@@ -75,11 +69,10 @@ public class Movie {
     public Movie() {
     }
 
-    public Movie(Long id, Long tmdbId, String title, String overview, String posterPath, LocalDate releaseDate, Double voteAverage, Integer voteCount) {
+    public Movie(Long id, Long tmdbId, String title, String posterPath, LocalDate releaseDate, Double voteAverage, Integer voteCount) {
         this.id = id;
         this.tmdbId = tmdbId;
         this.title = title;
-        this.overview = overview;
         this.posterPath = posterPath;
         this.releaseDate = releaseDate;
         this.voteAverage = voteAverage;

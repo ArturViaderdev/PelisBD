@@ -1,8 +1,6 @@
 package com.arturviader.pelisbdapi.service;
 
-import com.arturviader.pelisbdapi.dto.UserWatchedMapper;
-import com.arturviader.pelisbdapi.dto.WatchedItemDto;
-import com.arturviader.pelisbdapi.dto.WatchlistItemDto;
+import com.arturviader.pelisbdapi.dto.*;
 import com.arturviader.pelisbdapi.exception.ResourceNotFoundException;
 import com.arturviader.pelisbdapi.model.MediaType;
 import com.arturviader.pelisbdapi.model.User;
@@ -23,11 +21,11 @@ import static java.util.stream.Collectors.toList;
 public interface UserMediaService{
     void addToWatched(User user, MediaType type, Long itemId);
     void removeFromWatched(User user, MediaType type, Long itemId);
-    List<WatchedItemDto> getWatchedList(User user);
+    WatchedResponse getWatchedList(User user, int page, int size, String sort);
     boolean isMovieWatched(Long id, String username,MediaType mediaType);
     void addToWatchlist(User user, MediaType type, Long tmdbId);
     void removeFromWatchlist(User user, MediaType type, Long tmdbId);
     boolean isMovieInWatchlist(String userId, Long tmdbId, MediaType mediaType);
-    List<WatchlistItemDto> getWatchlist(User user);
+    WatchListResponse getWatchlist(User user, int page, int size, String sort);
 }
 

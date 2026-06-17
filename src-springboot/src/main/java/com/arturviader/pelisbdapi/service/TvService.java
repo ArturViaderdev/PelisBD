@@ -31,21 +31,19 @@ public class TvService {
                     Serie tv = new Serie();
                     tv.setTmdbId(tmdbSerie.getId());
                     tv.setTitle(tmdbSerie.getName());
-                    tv.setOverview(tmdbSerie.getOverview());
                     tv.setPosterPath(tmdbSerie.getPosterPath());
+                    tv.setReleaseDate(LocalDate.parse(tmdbSerie.getFirstAirDate()));
                     return tvRepository.save(tv);
                 });
     }
 
     private boolean needsUpdate(Serie serie, SerieTMDB tmdbSerie) {
         return !serie.getTitle().equals(tmdbSerie.getName())
-                || !serie.getOverview().equals(tmdbSerie.getOverview())
                 || !serie.getPosterPath().equals(tmdbSerie.getPosterPath());
     }
 
     private void updateSerie(Serie serie, SerieTMDB tmdbSerie) {
         serie.setTitle(tmdbSerie.getName());
-        serie.setOverview(tmdbSerie.getOverview());
         serie.setPosterPath(tmdbSerie.getPosterPath());
     }
 

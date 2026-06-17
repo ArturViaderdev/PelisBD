@@ -18,9 +18,6 @@ public class Serie {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
-    private String overview;
-
     @Column(name = "poster_path")
     private String posterPath;
 
@@ -49,9 +46,6 @@ public class Serie {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    public String getOverview() { return overview; }
-    public void setOverview(String overview) { this.overview = overview; }
-
     public String getPosterPath() { return posterPath; }
     public void setPosterPath(String posterPath) { this.posterPath = posterPath; }
 
@@ -79,5 +73,20 @@ public class Serie {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public Serie(Long id, Long tmdbId, String title, String posterPath, LocalDate releaseDate, Double voteAverage, Integer voteCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.tmdbId = tmdbId;
+        this.title = title;
+        this.posterPath = posterPath;
+        this.releaseDate = releaseDate;
+        this.voteAverage = voteAverage;
+        this.voteCount = voteCount;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public Serie() {
     }
 }

@@ -44,11 +44,10 @@ export default function MovieCard({ item, type = 'movie', onWatchlistToggle, onW
     ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
     : 'https://via.placeholder.com/342x513?text=Sin+Imagen';
 
-  const title = type === 'movie' ? item.title : item.name;
-  const year = type === 'movie'
-    ? new Date(item.release_date).getFullYear()
-    : new Date(item.first_air_date).getFullYear();
-
+  const title = item.title || item.name || 'Sin título';
+  const year = item.release_date
+  ? new Date(item.release_date).getFullYear()
+  : new Date(item.first_air_date).getFullYear();
   return (
      <Link
       to={`/${type}/${item.id}`}

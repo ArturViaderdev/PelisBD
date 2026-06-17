@@ -39,4 +39,9 @@ public class UserWatchlistItem {
 
     public LocalDateTime getAddedAt() { return addedAt; }
     public void setAddedAt(LocalDateTime addedAt) { this.addedAt = addedAt; }
+
+    public UserWatchlistItem()
+    {
+        addedAt = LocalDateTime.now();
+    }
 }
