@@ -19,6 +19,7 @@ export default function TVDetail() {
   const [averageRating, setAverageRating] = useState(null);
   const [totalRatings, setTotalRatings] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(null);
 
   useEffect(() => {
     let mounted = true;
@@ -118,7 +119,7 @@ export default function TVDetail() {
     if (!user) return;
     try {
       const response = await reviewService.addComment('tv', id, text, isPublic);
-      setComments([...comments, response.data]);
+      setComments(prev => [...prev, response.data]);
     } catch (error) {
       console.error('Error adding comment:', error);
     }
@@ -127,9 +128,19 @@ export default function TVDetail() {
   const handleDeleteComment = async (commentId) => {
     try {
       await reviewService.deleteComment(commentId);
-      setComments(comments.filter(c => c.id !== commentId));
+      setComments(prev => prev.filter(c => c.id !== commentId));
     } catch (error) {
       console.error('Error deleting comment:', error);
+    }
+  };
+
+  const handleUpdateComment = async (commentId, text) => {
+    try {
+      await reviewService.updateComment(commentId, text);
+      setComments(prev => prev.map(c => c.id === commentId ? { ...c, text } : c));
+      setIsEditing(null);
+    } catch (err) {
+      console.error('Error al editar:', err);
     }
   };
 
@@ -329,7 +340,10 @@ export default function TVDetail() {
             comments={comments}
             onAddComment={handleAddComment}
             onDeleteComment={handleDeleteComment}
-            currentUserId={user.id}
+            onEditComment={handleUpdateComment}
+            currentUserId={user?.id}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
           />
         </div>
       )}

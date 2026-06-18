@@ -24,12 +24,6 @@ public class Serie {
     @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    @Column(name = "vote_average")
-    private Double voteAverage;
-
-    @Column(name = "vote_count")
-    private Integer voteCount;
-
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -52,12 +46,6 @@ public class Serie {
     public LocalDate getReleaseDate() { return releaseDate; }
     public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
 
-    public Double getVoteAverage() { return voteAverage; }
-    public void setVoteAverage(Double voteAverage) { this.voteAverage = voteAverage; }
-
-    public Integer getVoteCount() { return voteCount; }
-    public void setVoteCount(Integer voteCount) { this.voteCount = voteCount; }
-
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
@@ -75,16 +63,14 @@ public class Serie {
         updatedAt = LocalDateTime.now();
     }
 
-    public Serie(Long id, Long tmdbId, String title, String posterPath, LocalDate releaseDate, Double voteAverage, Integer voteCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.tmdbId = tmdbId;
-        this.title = title;
-        this.posterPath = posterPath;
-        this.releaseDate = releaseDate;
-        this.voteAverage = voteAverage;
-        this.voteCount = voteCount;
-        this.createdAt = createdAt;
+    public Serie(LocalDateTime updatedAt, LocalDateTime createdAt, LocalDate releaseDate, String posterPath, String title, Long tmdbId, Long id) {
         this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
+        this.releaseDate = releaseDate;
+        this.posterPath = posterPath;
+        this.title = title;
+        this.tmdbId = tmdbId;
+        this.id = id;
     }
 
     public Serie() {

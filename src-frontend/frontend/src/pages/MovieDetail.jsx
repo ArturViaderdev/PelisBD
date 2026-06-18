@@ -16,6 +16,7 @@ export default function MovieDetail() {
   const [isWatched, setIsWatched] = useState(false);
   const [isWatchlisted, setIsWatchlisted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(null); // ✅ Nuevo: estado para edición
 
   useEffect(() => {
     let mounted = true;
@@ -107,7 +108,7 @@ export default function MovieDetail() {
     if (!user) return;
     try {
       const response = await reviewService.addComment('movie', id, text, isPublic);
-      setComments([...comments, response.data]);
+      setComments(prev => [...prev, response.data]);
     } catch (error) {
       console.error('Error adding comment:', error);
     }
@@ -116,7 +117,7 @@ export default function MovieDetail() {
   const handleDeleteComment = async (commentId) => {
     try {
       await reviewService.deleteComment(commentId);
-      setComments(comments.filter(c => c.id !== commentId));
+      setComments(prev => prev.filter(c => c.id !== commentId));
     } catch (error) {
       console.error('Error deleting comment:', error);
     }
@@ -147,6 +148,16 @@ export default function MovieDetail() {
       setIsWatchlisted(!isWatchlisted);
     } catch (error) {
       console.error('Error updating watchlist:', error);
+    }
+  };
+
+  const handleUpdateComment = async (commentId, text) => {
+    try {
+      await reviewService.updateComment(commentId, text);
+      setComments(prev => prev.map(c => c.id === commentId ? { ...c, text } : c));
+      setIsEditing(null);
+    } catch (err) {
+      console.error('Error al editar:', err);
     }
   };
 
@@ -269,7 +280,10 @@ export default function MovieDetail() {
             comments={comments}
             onAddComment={handleAddComment}
             onDeleteComment={handleDeleteComment}
-            currentUserId={user.id}
+            currentUserId={user?.id}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            onEditComment={handleUpdateComment}
           />
         </div>
       )}

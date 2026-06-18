@@ -11,7 +11,7 @@ export default function Watched() {
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1); // ✅ page=1 es la primera
   const [size] = useState(12);
-  const [sort, setSort] = useState('recent');
+  const [sort, setSort] = useState('dateadd');
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
   const navigate = useNavigate();

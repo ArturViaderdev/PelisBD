@@ -180,7 +180,6 @@ public class TMDBController {
     }
 
     public User getCurrentUser() {
-        System.out.println("getcurrent");
         try {
             User user = userService.getCurrentUser();
             return user;

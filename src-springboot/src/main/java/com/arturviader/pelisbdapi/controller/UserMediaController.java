@@ -55,7 +55,7 @@ public class UserMediaController {
     @GetMapping("/api/user/watchlist")
     public ResponseEntity<WatchListResponse> getWatchlist(@RequestParam (name="page", defaultValue="1") int page
     ,@RequestParam(name="size",defaultValue="12") int size
-    ,@RequestParam(name="sort", defaultValue = "recent") String sort)
+    ,@RequestParam(name="sort", defaultValue = "dateadd") String sort)
     {
         User user = getCurrentUser();
         WatchListResponse list = mediaService.getWatchlist(user,page,size,sort);
@@ -65,7 +65,7 @@ public class UserMediaController {
     @GetMapping("/api/user/watched")
     public ResponseEntity<WatchedResponse> getWatchedList(@RequestParam (name="page", defaultValue="1") int page
             ,@RequestParam(name="size",defaultValue="12") int size
-            ,@RequestParam(name="sort", defaultValue = "recent") String sort) {
+            ,@RequestParam(name="sort", defaultValue = "dateadd") String sort) {
         User user = getCurrentUser();
         WatchedResponse list = mediaService.getWatchedList(user,page,size,sort);
         return ResponseEntity.ok(list);

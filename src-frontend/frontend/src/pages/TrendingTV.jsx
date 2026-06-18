@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { tvService } from "../services/api";
 import MovieCard from "../components/MovieCard";
-import FilterBar from "../components/FilterBar";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 export default function TrendingTV() {
@@ -9,8 +8,6 @@ export default function TrendingTV() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filterType, setFilterType] = useState("all");
-  const [sortBy, setSortBy] = useState("popularity");
 
   useEffect(() => {
     const fetchTV = async () => {
@@ -32,13 +29,6 @@ export default function TrendingTV() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       <h1 className="text-3xl font-bold">Series en tendencia esta semana</h1>
-
-      <FilterBar
-        filterType={filterType}
-        sortBy={sortBy}
-        onFilterChange={setFilterType}
-        onSortChange={setSortBy}
-      />
 
       {isLoading ? (
         <div className="text-center py-12">

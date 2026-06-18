@@ -8,10 +8,10 @@ export default function MovieCard({ item, type = 'movie', onWatchlistToggle, onW
   const [isWatchlisted, setIsWatchlisted] = useState(item.watchListed || false);
   const [isWatched, setIsWatched] = useState(item.watched || false);
 
-  const user = useAuthStore(state => state.user); // ✅ Obtener el usuario
+  const user = useAuthStore(state => state.user);
 
   const handleWatchedToggle = async (movieId, movieType) => {
-    if (!user) return; // ✅ Verifica que el usuario esté autenticado
+    if (!user) return;
     try {
       if (isWatched) {
         await userService.removeFromWatched(movieType, movieId);
@@ -46,10 +46,15 @@ export default function MovieCard({ item, type = 'movie', onWatchlistToggle, onW
 
   const title = item.title || item.name || 'Sin título';
   const year = item.release_date
-  ? new Date(item.release_date).getFullYear()
-  : new Date(item.first_air_date).getFullYear();
+    ? new Date(item.release_date).getFullYear()
+    : new Date(item.first_air_date)?.getFullYear() || '—';
+
+  // Usar averageRating (puntuación media del usuario) si existe, sino vote_average (TMDB)
+  const userRating = item.averageRating || item.vote_average;
+  const ratingDisplay = userRating ? userRating.toFixed(1) : 'N/A';
+
   return (
-     <Link
+    <Link
       to={`/${type}/${item.id}`}
       className="group relative overflow-hidden rounded-lg card transform transition hover:scale-105"
     >
@@ -67,52 +72,51 @@ export default function MovieCard({ item, type = 'movie', onWatchlistToggle, onW
               <div className="flex items-center gap-1 text-yellow-400">
                 <FiStar size={16} fill="currentColor" />
                 <span className="text-sm font-semibold">
-                  {item.vote_average?.toFixed(1) || 'N/A'}
+                  {ratingDisplay}
                 </span>
               </div>
               <span className="text-gray-300 text-sm">{year}</span>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="p-3 bg-gray-900">
-        <h3 className="font-semibold text-white truncate mb-1">{title}</h3>
-        <p className="text-gray-400 text-sm">{year}</p>
+        <div className="p-3 bg-gray-900">
+          <h3 className="font-semibold text-white truncate mb-1">{title}</h3>
+          <p className="text-gray-400 text-sm">{year}</p>
 
-        <div className="flex gap-2 mt-3">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleWatchlistToggle(item.id, type);
-            }}
-            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-sm transition ${
-              isWatchlisted
-                ? 'bg-primary text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            <FiBookmark size={16} /> Lista
-          </button>
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleWatchlistToggle(item.id, type);
+              }}
+              className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-sm transition ${
+                isWatchlisted
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <FiBookmark size={16} /> Lista
+            </button>
 
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleWatchedToggle(item.id, type);
-            }}
-            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-sm transition ${
-              isWatched
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            <FiCheck size={16} /> Visto
-          </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleWatchedToggle(item.id, type);
+              }}
+              className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-sm transition ${
+                isWatched
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <FiCheck size={16} /> Visto
+            </button>
+          </div>
         </div>
       </div>
- 
     </Link>
   );
 }
