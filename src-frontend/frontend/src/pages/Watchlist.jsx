@@ -11,7 +11,7 @@ export default function Watchlist() {
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [size] = useState(12); // Tamaño fijo por página
-  const [sort, setSort] = useState('recent');
+  const [sort, setSort] = useState('dateadd');
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
   const navigate = useNavigate();

@@ -25,12 +25,6 @@ public class Movie {
     @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    @Column(name = "vote_average")
-    private Double voteAverage;
-
-    @Column(name = "vote_count")
-    private Integer voteCount;
-
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -53,13 +47,6 @@ public class Movie {
     public LocalDate getReleaseDate() { return releaseDate; }
     public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
 
-    public Double getVoteAverage() { return voteAverage; }
-    public void setVoteAverage(Double voteAverage) { this.voteAverage = voteAverage; }
-
-    public Integer getVoteCount() { return voteCount; }
-    public void setVoteCount(Integer voteCount) { this.voteCount = voteCount; }
-
-
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
@@ -69,14 +56,14 @@ public class Movie {
     public Movie() {
     }
 
-    public Movie(Long id, Long tmdbId, String title, String posterPath, LocalDate releaseDate, Double voteAverage, Integer voteCount) {
+    public Movie(Long id, Long tmdbId, String title, String posterPath, LocalDate releaseDate, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.tmdbId = tmdbId;
         this.title = title;
         this.posterPath = posterPath;
         this.releaseDate = releaseDate;
-        this.voteAverage = voteAverage;
-        this.voteCount = voteCount;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     @PrePersist

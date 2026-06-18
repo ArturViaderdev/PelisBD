@@ -89,7 +89,9 @@ public class SecurityConfig {
                                 "/api/user/watchlist/{tmbdId}",
                                 "/api/user/watchlist/{type}/{itemId}",
                                 "/api/reviews/{type}/{id}/rate",
-                                "/api/reviews/{type}/{id}/ratings"
+                                "/api/reviews/{type}/{id}/ratings",
+                                "/api/reviews/{type}/{itemId}/comments",
+                                "/api/reviews/comments/{commentId}"
 
                         ).hasAnyAuthority("ROLE_USER")
 

@@ -49,6 +49,9 @@ public class UserMediaServiceImpl implements UserMediaService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ReviewService reviewService;
+
     @Override
     public void addToWatched(User user, MediaType type, Long itemId) {
         System.out.println(user.getUserName());
@@ -126,10 +129,184 @@ public class UserMediaServiceImpl implements UserMediaService {
         return watchlistRepository.existsByUserAndItemIdAndType(user, tmdbId, mediaType);
     }
 
+    /*private void sortWatchlistItems(List<UserWatchlistItem> items, String sort, User user) {
+        for(int i=0; i < items.size()-1; i++){
+            for(int j=0; j < (items.size()-1-i); j++){
+                if(sort.equals("dateadd"))
+                {
+                    if(items.get(i).getAddedAt().isBefore(items.get(j+1).getAddedAt())){
+                        UserWatchlistItem aux=items.get(j);
+                        items.set(j,items.get(j+1));
+                        items.set(j+1,aux);
+                    }
+                }
+                else if(sort.equals("ownrating"))
+                {
+                    if(reviewService.getUserRate(user.getUserName(),items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getUserRate(user.getUserName(),items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
+                        UserWatchlistItem aux=items.get(j);
+                        items.set(j,items.get(j+1));
+                        items.set(j+1,aux);
+                    }
+                }
+                else if(sort.equals("userating"))
+                {
+                    if(reviewService.getAverageRating(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getAverageRating(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
+                        UserWatchlistItem aux=items.get(j);
+                        items.set(j,items.get(j+1));
+                        items.set(j+1,aux);
+                    }
+                }
+                else if(sort.equals("numrating")){
+                    if(reviewService.getTotalRatings(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getTotalRatings(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
+                        UserWatchlistItem aux=items.get(j);
+                        items.set(j,items.get(j+1));
+                        items.set(j+1,aux);
+                    }
+                }
+                else if(sort.equals("rating"))
+                {
+                    if(reviewService.getTotalRatings(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getTotalRatings(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
+                        UserWatchlistItem aux=items.get(j);
+                        items.set(j,items.get(j+1));
+                        items.set(j+1,aux);
+                    }
+                }
+            }
+        }
+    }*/
+
+    private String getTitleFromMedia(Long itemId, MediaType type) {
+        return switch (type) {
+            case movie -> movieService.findById(itemId).get().getTitle();
+            case tv -> tvService.findById(itemId).get().getTitle();
+            default -> null;
+        };
+    }
+
+    private void sortWatchedItems(List<UserWatchedItem> items, String sort, User user) {
+        items.sort((a, b) -> {
+            return switch (sort) {
+                case "dateadd" -> a.getWatchedAt().compareTo(b.getWatchedAt());
+                case "ownrating" -> {
+                    int ratingA = reviewService.getUserRate(user.getUserName(), a.getItemId(), a.getType().toString());
+                    int ratingB = reviewService.getUserRate(user.getUserName(), b.getItemId(), b.getType().toString());
+                    yield Integer.compare(ratingB, ratingA); // Descendente
+                }
+                case "userating" -> {
+                    Double avgRatingA = reviewService.getAverageRating(a.getItemId(), a.getType().toString());
+                    Double avgRatingB = reviewService.getAverageRating(b.getItemId(), b.getType().toString());
+                    if (avgRatingA == null) avgRatingA = 0.0;
+                    if (avgRatingB == null) avgRatingB = 0.0;
+                    yield avgRatingB.compareTo(avgRatingA);
+                }
+                case "numrating" -> {
+                    Long countA = reviewService.getTotalRatings(a.getItemId(), a.getType().toString());
+                    Long countB = reviewService.getTotalRatings(b.getItemId(), b.getType().toString());
+                    if (countA == null) countA = 0L;
+                    if (countB == null) countB = 0L;
+                    yield countB.compareTo(countA);
+                }
+                case "title" -> {
+                    String titleA = getTitleFromMedia(a.getItemId(), a.getType());
+                    String titleB = getTitleFromMedia(b.getItemId(), b.getType());
+                    if (titleA == null) titleA = "";
+                    if (titleB == null) titleB = "";
+                    yield titleA.compareToIgnoreCase(titleB);
+                }
+                default -> 0;
+            };
+        });
+    }
+
+
+    /*private void sortWatchedItems(List<UserWatchedItem> items, String sort, User user) {
+        for(int i=0; i < items.size()-1; i++){
+            for(int j=0; j < (items.size()-1-i); j++){
+                if(sort.equals("dateadd"))
+                {
+                    if(items.get(i).getWatchedAt().isBefore(items.get(j+1).getWatchedAt())){
+                        UserWatchedItem aux=items.get(j);
+                        items.set(j,items.get(j+1));
+                        items.set(j+1,aux);
+                    }
+                }
+                else if(sort.equals("ownrating"))
+                {
+                    if(reviewService.getUserRate(user.getUserName(),items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getUserRate(user.getUserName(),items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
+                        UserWatchedItem aux=items.get(j);
+                        items.set(j,items.get(j+1));
+                        items.set(j+1,aux);
+                    }
+                }
+                else if(sort.equals("userating"))
+                {
+                    if(reviewService.getAverageRating(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getAverageRating(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
+                        UserWatchedItem aux=items.get(j);
+                        items.set(j,items.get(j+1));
+                        items.set(j+1,aux);
+                    }
+                }
+                else if(sort.equals("numrating")){
+                    if(reviewService.getTotalRatings(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getTotalRatings(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
+                        UserWatchedItem aux=items.get(j);
+                        items.set(j,items.get(j+1));
+                        items.set(j+1,aux);
+                    }
+                }
+                else if(sort.equals("rating"))
+                {
+                    if(reviewService.getTotalRatings(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getTotalRatings(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
+                        UserWatchedItem aux=items.get(j);
+                        items.set(j,items.get(j+1));
+                        items.set(j+1,aux);
+                    }
+                }
+            }
+        }
+
+    }*/
+
+    private void sortWatchlistItems(List<UserWatchlistItem> items, String sort, User user) {
+        items.sort((a, b) -> {
+            return switch (sort) {
+                case "dateadd" -> a.getAddedAt().compareTo(b.getAddedAt());
+                case "ownrating" -> {
+                    int ratingA = reviewService.getUserRate(user.getUserName(), a.getItemId(), a.getType().toString());
+                    int ratingB = reviewService.getUserRate(user.getUserName(), b.getItemId(), b.getType().toString());
+                    yield Integer.compare(ratingB, ratingA); // Descendente: mayor primero
+                }
+                case "userating" -> {
+                    Double avgRatingA = reviewService.getAverageRating(a.getItemId(), a.getType().toString());
+                    Double avgRatingB = reviewService.getAverageRating(b.getItemId(), b.getType().toString());
+                    if (avgRatingA == null) avgRatingA = 0.0;
+                    if (avgRatingB == null) avgRatingB = 0.0;
+                    yield avgRatingB.compareTo(avgRatingA);
+                }
+                case "numrating" -> {
+                    Long countA = reviewService.getTotalRatings(a.getItemId(), a.getType().toString());
+                    Long countB = reviewService.getTotalRatings(b.getItemId(), b.getType().toString());
+                    if (countA == null) countA = 0L;
+                    if (countB == null) countB = 0L;
+                    yield countB.compareTo(countA);
+                }
+                case "title" -> {
+                    String titleA = getTitleFromMedia(a.getItemId(), a.getType());
+                    String titleB = getTitleFromMedia(b.getItemId(), b.getType());
+                    if (titleA == null) titleA = "";
+                    if (titleB == null) titleB = "";
+                    yield titleA.compareToIgnoreCase(titleB); // Ascendente
+                }
+                default -> 0;
+            };
+        });
+    }
+
+
     @Override
     public WatchListResponse getWatchlist(User user, int page, int size, String sort) {
         String userId = user.getUserName();
         List<UserWatchlistItem> watchListItems = watchlistRepository.findByUser(user);
+        sortWatchlistItems(watchListItems,sort, user);
         int totalElements = watchListItems.size();
         int totalPages = (int) Math.ceil((double) totalElements / size);
         boolean first = false;
@@ -166,6 +343,7 @@ public class UserMediaServiceImpl implements UserMediaService {
     public WatchedResponse getWatchedList(User user, int page, int size, String sort) {
         String userId = user.getUserName();
         List<UserWatchedItem> watchedItems = watchedRepo.findByUser(user);
+        sortWatchedItems(watchedItems,sort, user);
         int totalElements = watchedItems.size();
         int totalPages = (int) Math.ceil((double) totalElements / size);
         boolean first = false;

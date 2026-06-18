@@ -13,9 +13,10 @@ export default function FilterBar({
           onChange={(e) => onSortChange && onSortChange(e.target.value)}
           className="input-field"
         >
-          <option value="popularity">Popularidad</option>
-          <option value="rating">Calificación</option>
-          <option value="recent">Recientes</option>
+         <option value="dateadd">Fecha de inserción en mi lista</option> 
+          <option value="ownrating">Mi calificación</option>
+          <option value="userating">Calificación de los usuarios</option>
+          <option value="numrating">Número de votos de los usuarios</option>
           <option value="title">Título</option>
         </select>
       </div>
