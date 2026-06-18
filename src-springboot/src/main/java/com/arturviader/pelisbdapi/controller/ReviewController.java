@@ -1,0 +1,57 @@
+package com.arturviader.pelisbdapi.controller;
+
+import com.arturviader.pelisbdapi.model.Review;
+import com.arturviader.pelisbdapi.model.User;
+import com.arturviader.pelisbdapi.service.ReviewService;
+import com.arturviader.pelisbdapi.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/reviews")
+public class ReviewController {
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ReviewService reviewService;
+
+    @PostMapping("/{type}/{id}/rate")
+    public ResponseEntity<Map<String, Object>> rateItem(
+            @PathVariable String type,
+            @PathVariable Long id,
+            @RequestBody Map<String, Integer> request) {
+
+        Integer rating = request.get("rating");
+        if (rating == null || rating < 1 || rating > 5) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Rating must be between 1 and 5"));
+        }
+
+        String userId = getCurrentUser().getUserName();
+
+        Review review = reviewService.rateItem(userId, id, type, rating);
+        Map<String, Object> ratings = reviewService.getRatings(userId, id, type);
+
+        return ResponseEntity.ok(ratings);
+    }
+
+    @GetMapping("/{type}/{id}/ratings")
+    public ResponseEntity<Map<String, Object>> getItemRatings(
+            @PathVariable String type,
+            @PathVariable Long id) {
+
+        String userId = getCurrentUser().getUserName();
+
+        Map<String, Object> ratings = reviewService.getRatings(userId, id, type);
+
+        return ResponseEntity.ok(ratings);
+    }
+
+    public User getCurrentUser() {
+        return userService.getCurrentUser();
+    }
+}

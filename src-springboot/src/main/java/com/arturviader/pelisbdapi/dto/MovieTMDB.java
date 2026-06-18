@@ -1,5 +1,6 @@
 package com.arturviader.pelisbdapi.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -10,6 +11,7 @@ public class MovieTMDB {
     private String overview;
     private boolean isWatchListed;
     private boolean isWatched;
+    private String poster_path;
 
     public MovieTMDB(Long id, String title, String release_date, String overview, String poster_path) {
         this.id = id;
@@ -18,8 +20,6 @@ public class MovieTMDB {
         this.overview = overview;
         this.poster_path = poster_path;
     }
-
-    private String poster_path;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

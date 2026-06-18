@@ -133,7 +133,10 @@ public class UserServiceImpl implements UserService{
             throw new NoUserAuthenticated();
         }
         String username = authentication.getName();
-        System.out.println("Username" + username);
+        if(username.equals("anonymousUser"))
+        {
+            throw new NoUserAuthenticated();
+        }
         return userRepository.findByUserName(username)
                 .orElseThrow(() -> new UserNotFound());
     }

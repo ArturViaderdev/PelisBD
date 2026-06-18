@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/authStore';
 import RatingStars from '../components/RatingStars';
 import CommentSection from '../components/CommentSection';
 import { FiBookmark, FiCheck } from 'react-icons/fi';
-import VideoList from '../components/VideoList'; // ✅ Importar el componente reutilizable
+import VideoList from '../components/VideoList';
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -18,48 +18,77 @@ export default function MovieDetail() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchData = async () => {
       try {
         setIsLoading(true);
+
         const movieRes = await moviesService.getMovieDetail(id);
-        setMovie(movieRes.data);
+        const movieData = movieRes.data;
+
+        if (mounted) {
+          setMovie(movieData);
+          setIsWatched(Boolean(movieData.watched));
+          setIsWatchlisted(Boolean(movieData.watchListed));
+        }
 
         if (user) {
-         try {
-            const watchedRes = await userService.isMovieWatched('movie',id);
-            setIsWatched(watchedRes.data.value);
-        } catch (err) {
-          console.error('Error checking watched status:', err);
-          setIsWatched(false);
-        }
-        try {
-            const watchedRes = await userService.isMovieInWatchList('movie',id);
-            setIsWatchlisted(watchedRes.data.value);
-        } catch (err) {
-            console.error('Error checking watchlisted status:', err);
-            setIsWatchlisted(false);
-        }
-        
-          const [ratingsRes, commentsRes] = await Promise.all([
-            reviewService.getItemRatings('movie', id),
-            reviewService.getComments('movie', id, false),
-          ]);
+          try {
+            const watchedRes = await userService.isMovieWatched('movie', id);
+            if (mounted) setIsWatched(Boolean(watchedRes.data?.value));
+          } catch (err) {
+            console.error('Error checking watched status:', err);
+            if (mounted) setIsWatched(Boolean(movieData.watched));
+          }
 
-          const userRating = ratingsRes.data.ratings?.find(r => r.userId === user.id);
-          if (userRating) setRating(userRating.rating);
-          setComments(commentsRes.data || []);
+          try {
+            const watchlistRes = await userService.isMovieInWatchList('movie', id);
+            if (mounted) setIsWatchlisted(Boolean(watchlistRes.data?.value));
+          } catch (err) {
+            console.error('Error checking watchlisted status:', err);
+            if (mounted) setIsWatchlisted(Boolean(movieData.watchListed));
+          }
+
+          try {
+            const ratingsRes = await reviewService.getItemRatings('movie', id);
+            if (mounted) {
+              setRating(ratingsRes.data?.userRating ?? 0);
+              setMovie({
+                ...movieData,
+                averageRating: ratingsRes.data?.averageRating,
+                totalRatings: ratingsRes.data?.totalRatings,
+              });
+            }
+          } catch (err) {
+            console.error('Error loading ratings:', err);
+            if (mounted) {
+              setRating(0);
+            }
+          }
+
+          try {
+            const commentsRes = await reviewService.getComments('movie', id, false);
+            if (mounted) setComments(commentsRes.data || []);
+          } catch (err) {
+            console.error('Comments not available yet:', err);
+            if (mounted) setComments([]);
+          }
         }
       } catch (error) {
         console.error('Error fetching movie details:', error);
+        if (mounted) setMovie(null);
       } finally {
-        setIsLoading(false);
+        if (mounted) setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [id, user]);
-  
 
+    return () => {
+      mounted = false;
+    };
+  }, [id, user]);
 
   const handleRate = async (newRating) => {
     if (!user) {
@@ -130,7 +159,6 @@ export default function MovieDetail() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-      {/* Backdrop */}
       {backdropUrl && (
         <div className="relative rounded-lg overflow-hidden h-96">
           <img
@@ -143,7 +171,6 @@ export default function MovieDetail() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Póster */}
         <div className="md:col-span-1">
           <img
             src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
@@ -152,7 +179,6 @@ export default function MovieDetail() {
           />
         </div>
 
-        {/* Información */}
         <div className="md:col-span-3 space-y-4">
           <h1 className="text-4xl font-bold">{movie.title}</h1>
 
@@ -167,6 +193,7 @@ export default function MovieDetail() {
             >
               <FiCheck /> {isWatched ? 'Visto' : 'Marcar como visto'}
             </button>
+
             <button
               onClick={handleWatchlistToggle}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
@@ -183,10 +210,22 @@ export default function MovieDetail() {
             <p className="text-gray-400 text-sm mb-2">Calificación de TMDB</p>
             <div className="flex items-center gap-4">
               <div className="text-4xl font-bold text-yellow-400">
-                {movie.vote_average?.toFixed(1)}
+                {movie.vote_average?.toFixed(1) || '—'}
               </div>
               <div className="text-gray-400">
-                {movie.vote_count?.toLocaleString()} votos
+                {movie.vote_count?.toLocaleString() || '0'} votos
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-gray-400 text-sm mb-2">Puntuación media del usuario</p>
+            <div className="flex items-center gap-4">
+              <div className="text-4xl font-bold text-yellow-400">
+                {movie.averageRating?.toFixed(1) || '—'}
+              </div>
+              <div className="text-gray-400">
+                {movie.totalRatings?.toLocaleString() || '0'} calificaciones
               </div>
             </div>
           </div>
@@ -203,28 +242,27 @@ export default function MovieDetail() {
             <p className="text-white leading-relaxed">{movie.overview}</p>
           </div>
 
-          {movie.release_date && (
-            <div>
-              <p className="text-gray-400 text-sm">
-                Fecha de lanzamiento: {new Date(movie.release_date).toLocaleDateString('es-ES')}
-              </p>
-            </div>
-          )}
-
-          {movie.runtime && (
-            <div>
-              <p className="text-gray-400 text-sm">Duración: {movie.runtime} minutos</p>
-            </div>
-          )}
-
-          {/* ✅ VideoList reutilizable */}
-          {movie.videos && movie.videos.length > 0 && (
-            <VideoList videos={movie.videos} title={movie.title} />
-          )}
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            {movie.release_date && (
+              <div>
+                <p className="text-gray-400">Fecha de lanzamiento</p>
+                <p>{new Date(movie.release_date).toLocaleDateString('es-ES')}</p>
+              </div>
+            )}
+            {movie.runtime && (
+              <div>
+                <p className="text-gray-400">Duración</p>
+                <p>{movie.runtime} minutos</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Comentarios */}
+      {movie.videos && movie.videos.length > 0 && (
+        <VideoList videos={movie.videos} title={movie.title} />
+      )}
+
       {user && (
         <div className="border-t border-gray-800 pt-8">
           <CommentSection
@@ -234,7 +272,6 @@ export default function MovieDetail() {
             currentUserId={user.id}
           />
         </div>
-        
       )}
     </div>
   );

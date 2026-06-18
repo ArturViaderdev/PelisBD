@@ -1,26 +1,39 @@
 package com.arturviader.pelisbdapi.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class MovieDetailTMDB extends MovieTMDB {
-    private Double voteAverage;
     private String backdropPath;
     private String originalLanguage;
     private List<Genre> genres;
     private List<VideoTMDB> videos;
     private String trailerKey;
+    @JsonProperty("vote_average")
+    private Double voteAverage;
+    @JsonProperty("vote_count")
+    private Integer voteCount;
 
-    public MovieDetailTMDB(Long id, String title, String release_date, String overview, String poster_path, Double voteAverage, String backdropPath, String originalLanguage, List<Genre> genres, List<VideoTMDB> videos, String trailerKey) {
+    public MovieDetailTMDB(Long id, String title, String release_date, String overview, String poster_path, String backdropPath, String originalLanguage, List<Genre> genres, List<VideoTMDB> videos, String trailerKey, Double voteAverage, Integer voteCount) {
         super(id, title, release_date, overview, poster_path);
-        this.voteAverage = voteAverage;
         this.backdropPath = backdropPath;
         this.originalLanguage = originalLanguage;
         this.genres = genres;
         this.videos = videos;
         this.trailerKey = trailerKey;
+        this.voteAverage = voteAverage;
+        this.voteCount = voteCount;
+    }
+
+    public Integer getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(Integer voteCount) {
+        this.voteCount = voteCount;
     }
 
     public Double getVoteAverage() {
