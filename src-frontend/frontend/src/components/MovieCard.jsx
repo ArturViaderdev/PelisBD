@@ -1,22 +1,55 @@
 import { Link } from 'react-router-dom';
 import { FiBookmark, FiCheck, FiStar } from 'react-icons/fi';
 import { useState } from 'react';
+import { useAuthStore } from '../stores/authStore';
+import { userService } from '../services/api'; 
 
-export default function MovieCard({ item, type = 'movie' }) {
-  const [isWatchlisted, setIsWatchlisted] = useState(item.isWatchlisted || false);
-  const [isWatched, setIsWatched] = useState(item.isWatched || false);
+export default function MovieCard({ item, type = 'movie', onWatchlistToggle, onWatchedToggle }) {
+  const [isWatchlisted, setIsWatchlisted] = useState(item.watchListed || false);
+  const [isWatched, setIsWatched] = useState(item.watched || false);
+
+  const user = useAuthStore(state => state.user); // ✅ Obtener el usuario
+
+  const handleWatchedToggle = async (movieId, movieType) => {
+    if (!user) return; // ✅ Verifica que el usuario esté autenticado
+    try {
+      if (isWatched) {
+        await userService.removeFromWatched(movieType, movieId);
+      } else {
+        await userService.addToWatched(movieType, movieId);
+      }
+      setIsWatched(!isWatched);
+      onWatchedToggle?.(movieId, movieType, !isWatched);
+    } catch (error) {
+      console.error('Error updating watched status:', error);
+    }
+  };
+
+  const handleWatchlistToggle = async (movieId, movieType) => {
+    if (!user) return;
+    try {
+      if (isWatchlisted) {
+        await userService.removeFromWatchlist(movieType, movieId);
+      } else {
+        await userService.addToWatchlist(movieType, movieId);
+      }
+      setIsWatchlisted(!isWatchlisted);
+      onWatchlistToggle?.(movieId, movieType, !isWatchlisted);
+    } catch (error) {
+      console.error('Error updating watchlist:', error);
+    }
+  };
 
   const posterUrl = item.poster_path
     ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
     : 'https://via.placeholder.com/342x513?text=Sin+Imagen';
 
-  const title = type === 'movie' ? item.title : item.name;
-  const year = type === 'movie'
-    ? new Date(item.release_date).getFullYear()
-    : new Date(item.first_air_date).getFullYear();
-
+  const title = item.title || item.name || 'Sin título';
+  const year = item.release_date
+  ? new Date(item.release_date).getFullYear()
+  : new Date(item.first_air_date).getFullYear();
   return (
-    <Link
+     <Link
       to={`/${type}/${item.id}`}
       className="group relative overflow-hidden rounded-lg card transform transition hover:scale-105"
     >
@@ -51,7 +84,8 @@ export default function MovieCard({ item, type = 'movie' }) {
           <button
             onClick={(e) => {
               e.preventDefault();
-              setIsWatchlisted(!isWatchlisted);
+              e.stopPropagation();
+              handleWatchlistToggle(item.id, type);
             }}
             className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-sm transition ${
               isWatchlisted
@@ -61,10 +95,12 @@ export default function MovieCard({ item, type = 'movie' }) {
           >
             <FiBookmark size={16} /> Lista
           </button>
+
           <button
             onClick={(e) => {
               e.preventDefault();
-              setIsWatched(!isWatched);
+              e.stopPropagation();
+              handleWatchedToggle(item.id, type);
             }}
             className={`flex-1 flex items-center justify-center gap-1 py-1 rounded text-sm transition ${
               isWatched
@@ -76,6 +112,7 @@ export default function MovieCard({ item, type = 'movie' }) {
           </button>
         </div>
       </div>
+ 
     </Link>
   );
 }

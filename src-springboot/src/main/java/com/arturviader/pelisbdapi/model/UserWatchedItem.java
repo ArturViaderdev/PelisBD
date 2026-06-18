@@ -43,5 +43,6 @@ public class UserWatchedItem {
     public void setWatchedAt(LocalDateTime watchedAt) { this.watchedAt = watchedAt; }
 
     public UserWatchedItem () {
+        watchedAt = LocalDateTime.now();
     }
 }

@@ -1,15 +1,19 @@
 package com.arturviader.pelisbdapi.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class MovieTMDB {
-    private int id;
+    private Long id;
     private String title;
     private String release_date;
     private String overview;
+    private boolean isWatchListed;
+    private boolean isWatched;
+    private String poster_path;
 
-    public MovieTMDB(int id, String title, String release_date, String overview, String poster_path) {
+    public MovieTMDB(Long id, String title, String release_date, String overview, String poster_path) {
         this.id = id;
         this.title = title;
         this.release_date = release_date;
@@ -17,10 +21,8 @@ public class MovieTMDB {
         this.poster_path = poster_path;
     }
 
-    private String poster_path;
-
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -33,4 +35,20 @@ public class MovieTMDB {
 
     public String getPoster_path() { return poster_path; }
     public void setPoster_path(String poster_path) { this.poster_path = poster_path; }
+
+    public boolean isWatchListed() {
+        return isWatchListed;
+    }
+
+    public void setWatchListed(boolean watchListed) {
+        isWatchListed = watchListed;
+    }
+
+    public boolean isWatched() {
+        return isWatched;
+    }
+
+    public void setWatched(boolean watched) {
+        isWatched = watched;
+    }
 }

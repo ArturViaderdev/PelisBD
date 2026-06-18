@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
@@ -19,8 +21,18 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        System.out.println("🔍 Buscando usuario con: '" + username + "'");
+
+        // Intenta buscar por username primero
+        Optional<User> userOpt = userRepository.findByUserName(username);
+
+        // Si no, busca por email
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByEmail(username);
+        }
+
+        User user = userOpt.orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
         return new JwtUserDetails(user);
     }
 }

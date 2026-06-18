@@ -56,8 +56,8 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/confirmemail",
                                 "/error",
+                                "/api/movies/popular/{page}", //Endpoint que no detecta el login, necesita poder ser accedido tanto desde usuario no logeado como logeado
                                 "/api/movies/{id}",
-                                "/api/movies/popular/{page}",
                                 "/api/movies/trending",
                                 "/api/movies/categories",
                                 "/api/movies/category/{page}",
@@ -74,15 +74,23 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // ✅ Rutas protegidas: requieren ROLE_USER
+                        //endpoints que detectan el login
                         .requestMatchers(
                                 "/api/user/watched",
                                 "/api/user/watched/{type}/{itemId}",
+                                "/api/user/watched/status/{type}/{tmbdId}",
                                 "/api/user/watchlist",
                                 "/api/user/watchlist/{type}/{itemId}",
+                                "/api/user/watchlist/status/{type}/{tmbdId}",
                                 "/api/user/tv/{tvId}/episode",
                                 "/api/user/tv/{tvId}/season",
                                 "/api/user/tv/{tvId}",
-                                "/api/user/watchlist"
+                                "/api/user/watched/{tmdbId}",
+                                "/api/user/watchlist/{tmbdId}",
+                                "/api/user/watchlist/{type}/{itemId}",
+                                "/api/reviews/{type}/{id}/rate",
+                                "/api/reviews/{type}/{id}/ratings"
+
                         ).hasAnyAuthority("ROLE_USER")
 
                         .anyRequest().authenticated()

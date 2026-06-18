@@ -5,8 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 public record WatchlistItemDto(
-        @JsonProperty("id") Long id,
+        @JsonProperty("id") Long id, // ✅ Ahora es tmdbId
         @JsonProperty("type") String type,
-        @JsonProperty("item_id") Long itemId,
-        @JsonProperty("watched_at") LocalDateTime watchedAt
+        @JsonProperty("added_at") LocalDateTime addedAt,
+        @JsonProperty("title") String title,
+        @JsonProperty("poster_path") String posterPath,
+        @JsonProperty("release_date") String releaseDate, // ✅ yyyy-MM-dd
+        @JsonProperty("media_type") String mediaType,
+        @JsonProperty("watchListed") boolean isWatchListed,
+        @JsonProperty("watched") boolean isWatched
 ) {}
