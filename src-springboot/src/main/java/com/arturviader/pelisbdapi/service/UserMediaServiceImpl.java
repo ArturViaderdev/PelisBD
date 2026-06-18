@@ -94,7 +94,14 @@ public class UserMediaServiceImpl implements UserMediaService {
     public void addToWatchlist(User user, MediaType type, Long tmdbId) {
         UserWatchlistItem item = watchlistRepository.findByUserAndTypeAndItemId(user, type, tmdbId)
                 .orElse(new UserWatchlistItem());
-        movieService.saveIfNotExists(tmdbService.getMovieById(tmdbId),"movie");
+        if(type.equals(MediaType.movie))
+        {
+            movieService.saveIfNotExists(tmdbService.getMovieById(tmdbId),"movie");
+        }
+        else
+        {
+            tvService.saveIfNotExists(tmdbService.getTvShowDetail(tmdbId),"tv");
+        }
         item.setUser(user);
         item.setType(type);
         item.setItemId(tmdbId);
