@@ -1,5 +1,6 @@
-package com.arturviader.pelisbdapi.dto;
+package com.arturviader.pelisbdapi.mapper;
 
+import com.arturviader.pelisbdapi.dto.CommentDto;
 import com.arturviader.pelisbdapi.model.Comment;
 import com.arturviader.pelisbdapi.model.User;
 

@@ -23,6 +23,9 @@ export const authService = {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   },
+  confirmEmail: (token) => {
+    api.post (`/auth/confirmemail?token=${token}`)
+  }
 };
 
 // Movies

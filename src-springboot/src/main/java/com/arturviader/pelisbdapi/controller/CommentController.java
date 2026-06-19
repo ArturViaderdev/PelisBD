@@ -1,16 +1,11 @@
 package com.arturviader.pelisbdapi.controller;
 
 import com.arturviader.pelisbdapi.dto.CommentDto;
-import com.arturviader.pelisbdapi.exception.NoUserAuthenticated;
 import com.arturviader.pelisbdapi.model.MediaType;
-import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.service.CommentService;
 import com.arturviader.pelisbdapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +15,6 @@ import java.util.Map;
 @RequestMapping("/api/reviews")
 @CrossOrigin(origins = "*")
 public class CommentController {
-
     @Autowired
     private UserService userService;
 
@@ -49,7 +43,6 @@ public class CommentController {
                 text,
                 isPublic
         );
-
         return ResponseEntity.ok(dto);
     }
 
@@ -68,7 +61,6 @@ public class CommentController {
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId
     ) {
-
         commentService.deleteComment(commentId);
         return ResponseEntity.noContent().build();
     }
@@ -82,10 +74,8 @@ public class CommentController {
         if (text == null || text.trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-
         CommentDto dto = commentService.updateComment(commentId, text);
         return ResponseEntity.ok(dto);
     }
-
 }
 

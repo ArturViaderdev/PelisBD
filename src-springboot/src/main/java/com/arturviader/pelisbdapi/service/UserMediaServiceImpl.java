@@ -2,6 +2,8 @@ package com.arturviader.pelisbdapi.service;
 
 import com.arturviader.pelisbdapi.dto.*;
 import com.arturviader.pelisbdapi.exception.ResourceNotFoundException;
+import com.arturviader.pelisbdapi.mapper.UserWatchListMapper;
+import com.arturviader.pelisbdapi.mapper.UserWatchedMapper;
 import com.arturviader.pelisbdapi.model.*;
 import com.arturviader.pelisbdapi.repository.UserEpisodeProgressRepository;
 import com.arturviader.pelisbdapi.repository.UserRepository;
@@ -15,8 +17,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -50,21 +50,16 @@ public class UserMediaServiceImpl implements UserMediaService {
     private UserRepository userRepository;
 
     @Autowired
-    private ReviewService reviewService;
+    private ReviewServiceImpl reviewService;
 
     @Override
     public void addToWatched(User user, MediaType type, Long itemId) {
-        System.out.println(user.getUserName());
-        System.out.println(user.getEmail());
         UserWatchedItem item = watchedRepo.findByUserAndTypeAndItemId(user, type, itemId)
                 .orElse(new UserWatchedItem());
-        if(type.equals(MediaType.movie))
-        {
-            movieService.saveIfNotExists(tmdbService.getMovieById(itemId),"movie");
-        }
-        else
-        {
-             tvService.saveIfNotExists(tmdbService.getTvShowDetail(itemId),"tv");
+        if (type.equals(MediaType.movie)) {
+            movieService.saveIfNotExists(tmdbService.getMovieById(itemId), "movie");
+        } else {
+            tvService.saveIfNotExists(tmdbService.getTvShowDetail(itemId), "tv");
         }
         item.setUser(user);
         item.setType(type);
@@ -97,13 +92,10 @@ public class UserMediaServiceImpl implements UserMediaService {
     public void addToWatchlist(User user, MediaType type, Long tmdbId) {
         UserWatchlistItem item = watchlistRepository.findByUserAndTypeAndItemId(user, type, tmdbId)
                 .orElse(new UserWatchlistItem());
-        if(type.equals(MediaType.movie))
-        {
-            movieService.saveIfNotExists(tmdbService.getMovieById(tmdbId),"movie");
-        }
-        else
-        {
-            tvService.saveIfNotExists(tmdbService.getTvShowDetail(tmdbId),"tv");
+        if (type.equals(MediaType.movie)) {
+            movieService.saveIfNotExists(tmdbService.getMovieById(tmdbId), "movie");
+        } else {
+            tvService.saveIfNotExists(tmdbService.getTvShowDetail(tmdbId), "tv");
         }
         item.setUser(user);
         item.setType(type);
@@ -120,7 +112,7 @@ public class UserMediaServiceImpl implements UserMediaService {
     }
 
     @Override
-    public boolean isMovieInWatchlist(String userId, Long tmdbId,MediaType mediaType) {
+    public boolean isMovieInWatchlist(String userId, Long tmdbId, MediaType mediaType) {
         Optional<User> userOpt = userRepository.findByUserName(userId);
         if (userOpt.isEmpty()) {
             return false;
@@ -128,52 +120,6 @@ public class UserMediaServiceImpl implements UserMediaService {
         User user = userOpt.get();
         return watchlistRepository.existsByUserAndItemIdAndType(user, tmdbId, mediaType);
     }
-
-    /*private void sortWatchlistItems(List<UserWatchlistItem> items, String sort, User user) {
-        for(int i=0; i < items.size()-1; i++){
-            for(int j=0; j < (items.size()-1-i); j++){
-                if(sort.equals("dateadd"))
-                {
-                    if(items.get(i).getAddedAt().isBefore(items.get(j+1).getAddedAt())){
-                        UserWatchlistItem aux=items.get(j);
-                        items.set(j,items.get(j+1));
-                        items.set(j+1,aux);
-                    }
-                }
-                else if(sort.equals("ownrating"))
-                {
-                    if(reviewService.getUserRate(user.getUserName(),items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getUserRate(user.getUserName(),items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
-                        UserWatchlistItem aux=items.get(j);
-                        items.set(j,items.get(j+1));
-                        items.set(j+1,aux);
-                    }
-                }
-                else if(sort.equals("userating"))
-                {
-                    if(reviewService.getAverageRating(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getAverageRating(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
-                        UserWatchlistItem aux=items.get(j);
-                        items.set(j,items.get(j+1));
-                        items.set(j+1,aux);
-                    }
-                }
-                else if(sort.equals("numrating")){
-                    if(reviewService.getTotalRatings(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getTotalRatings(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
-                        UserWatchlistItem aux=items.get(j);
-                        items.set(j,items.get(j+1));
-                        items.set(j+1,aux);
-                    }
-                }
-                else if(sort.equals("rating"))
-                {
-                    if(reviewService.getTotalRatings(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getTotalRatings(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
-                        UserWatchlistItem aux=items.get(j);
-                        items.set(j,items.get(j+1));
-                        items.set(j+1,aux);
-                    }
-                }
-            }
-        }
-    }*/
 
     private String getTitleFromMedia(Long itemId, MediaType type) {
         return switch (type) {
@@ -218,54 +164,6 @@ public class UserMediaServiceImpl implements UserMediaService {
         });
     }
 
-
-    /*private void sortWatchedItems(List<UserWatchedItem> items, String sort, User user) {
-        for(int i=0; i < items.size()-1; i++){
-            for(int j=0; j < (items.size()-1-i); j++){
-                if(sort.equals("dateadd"))
-                {
-                    if(items.get(i).getWatchedAt().isBefore(items.get(j+1).getWatchedAt())){
-                        UserWatchedItem aux=items.get(j);
-                        items.set(j,items.get(j+1));
-                        items.set(j+1,aux);
-                    }
-                }
-                else if(sort.equals("ownrating"))
-                {
-                    if(reviewService.getUserRate(user.getUserName(),items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getUserRate(user.getUserName(),items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
-                        UserWatchedItem aux=items.get(j);
-                        items.set(j,items.get(j+1));
-                        items.set(j+1,aux);
-                    }
-                }
-                else if(sort.equals("userating"))
-                {
-                    if(reviewService.getAverageRating(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getAverageRating(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
-                        UserWatchedItem aux=items.get(j);
-                        items.set(j,items.get(j+1));
-                        items.set(j+1,aux);
-                    }
-                }
-                else if(sort.equals("numrating")){
-                    if(reviewService.getTotalRatings(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getTotalRatings(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
-                        UserWatchedItem aux=items.get(j);
-                        items.set(j,items.get(j+1));
-                        items.set(j+1,aux);
-                    }
-                }
-                else if(sort.equals("rating"))
-                {
-                    if(reviewService.getTotalRatings(items.get(i).getItemId(),items.get(i).getType().toString()) < reviewService.getTotalRatings(items.get(j+1).getItemId(),items.get(j+1).getType().toString())){
-                        UserWatchedItem aux=items.get(j);
-                        items.set(j,items.get(j+1));
-                        items.set(j+1,aux);
-                    }
-                }
-            }
-        }
-
-    }*/
-
     private void sortWatchlistItems(List<UserWatchlistItem> items, String sort, User user) {
         items.sort((a, b) -> {
             return switch (sort) {
@@ -301,70 +199,61 @@ public class UserMediaServiceImpl implements UserMediaService {
         });
     }
 
-
     @Override
     public WatchListResponse getWatchlist(User user, int page, int size, String sort) {
         String userId = user.getUserName();
         List<UserWatchlistItem> watchListItems = watchlistRepository.findByUser(user);
-        sortWatchlistItems(watchListItems,sort, user);
+        sortWatchlistItems(watchListItems, sort, user);
         int totalElements = watchListItems.size();
         int totalPages = (int) Math.ceil((double) totalElements / size);
         boolean first = false;
         boolean last = false;
-        if(page<=1)
-        {
-            first=true;
+        if (page <= 1) {
+            first = true;
         }
-        if(page>=totalPages)
-        {
+        if (page >= totalPages) {
             last = true;
         }
-        int initialResult =(page-1)*size;
+        int initialResult = (page - 1) * size;
         int endResult = initialResult + size;
-        if(endResult>totalElements)
-        {
-            endResult = totalElements-1;
+        if (endResult > totalElements) {
+            endResult = totalElements - 1;
         }
         List<UserWatchlistItem> results = new ArrayList<>();
-        for(int count=initialResult; count<=endResult;count++)
-        {
+        for (int count = initialResult; count <= endResult; count++) {
             results.add(watchListItems.get(count));
         }
         List<WatchlistItemDto> itemsdto = results.stream()
                 .map(item -> {
-                    boolean isWatched = isMovieWatched(item.getItemId(),userId, item.getType());
+                    boolean isWatched = isMovieWatched(item.getItemId(), userId, item.getType());
                     return userWatchListMapper.toDtoWithMovieData(item, isWatched);
                 })
                 .toList();
-        return new WatchListResponse(itemsdto,page,size,totalElements,totalPages,last,first);
+        return new WatchListResponse(itemsdto, page, size, totalElements, totalPages, last, first);
     }
 
     @Override
     public WatchedResponse getWatchedList(User user, int page, int size, String sort) {
         String userId = user.getUserName();
         List<UserWatchedItem> watchedItems = watchedRepo.findByUser(user);
-        sortWatchedItems(watchedItems,sort, user);
+        sortWatchedItems(watchedItems, sort, user);
         int totalElements = watchedItems.size();
         int totalPages = (int) Math.ceil((double) totalElements / size);
         boolean first = false;
         boolean last = false;
-        if(page<=1)
-        {
-            first=true;
+        if (page <= 1) {
+            first = true;
         }
-        if(page>=totalPages)
-        {
+        if (page >= totalPages) {
             last = true;
         }
-        int initialResult =(page-1)*size;
+        int initialResult = (page - 1) * size;
         int endResult = initialResult + size;
-        if(endResult>totalElements)
-        {
-            endResult = totalElements-1;
+        if (endResult > totalElements) {
+            endResult = totalElements - 1;
         }
         List<UserWatchedItem> results = new ArrayList<>();
-        for(int count=initialResult; count<=endResult;count++)
-        {
+        for (int count = initialResult; count <= endResult; count++) {
             results.add(watchedItems.get(count));
         }
         List<WatchedItemDto> itemsdto = results.stream()
@@ -373,6 +262,6 @@ public class UserMediaServiceImpl implements UserMediaService {
                     return userWatchedMapper.toDtoWithMovieData(item, isWatchListed);
                 })
                 .toList();
-        return new WatchedResponse(itemsdto,page,size,totalElements,totalPages,last,first);
+        return new WatchedResponse(itemsdto, page, size, totalElements, totalPages, last, first);
     }
 }

@@ -35,19 +35,16 @@ public class Comment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Comment(Long id, User user, Long itemId, MediaType itemType, String commentText, boolean isPublic, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
+    public Comment(User user, Long itemId, MediaType itemType, String commentText, boolean isPublic, LocalDateTime createdAt) {
         this.user = user;
         this.itemId = itemId;
         this.itemType = itemType;
         this.commentText = commentText;
         this.isPublic = isPublic;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
-    public Comment()
-    {
+    public Comment() {
 
     }
 

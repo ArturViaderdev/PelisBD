@@ -8,9 +8,6 @@ import com.arturviader.pelisbdapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,9 +27,9 @@ public class TMDBController {
 
     @GetMapping("/api/search/movie")
     public ResponseEntity<MoviesResponseTMDB> searchMovies(@RequestParam String query,
-                               @RequestParam (defaultValue = "1") int page) {
+                                                           @RequestParam(defaultValue = "1") int page) {
         User user = getCurrentUser();
-        return ResponseEntity.ok(tmdbService.searchMovie(query,page,user));
+        return ResponseEntity.ok(tmdbService.searchMovie(query, page, user));
     }
 
     @GetMapping("/api/movies/{id}")
@@ -49,7 +46,7 @@ public class TMDBController {
             @RequestParam(defaultValue = "1") int page) {
 
         User user = getCurrentUser();
-        MoviesResponseTMDB movies = tmdbService.getPopularMovies(page,user);
+        MoviesResponseTMDB movies = tmdbService.getPopularMovies(page, user);
         return ResponseEntity.ok(movies);
     }
 
@@ -58,7 +55,7 @@ public class TMDBController {
             @RequestParam(defaultValue = "day") String timeWindow,
             @RequestParam(defaultValue = "1") int page) {
         User user = getCurrentUser();
-        MoviesResponseTMDB movies = tmdbService.getTrendingMovies(timeWindow, page,user);
+        MoviesResponseTMDB movies = tmdbService.getTrendingMovies(timeWindow, page, user);
         return ResponseEntity.ok(movies);
     }
 
@@ -66,7 +63,7 @@ public class TMDBController {
     public ResponseEntity<SeriesResponseTMDB> getPopularTvShows(
             @RequestParam(defaultValue = "1") int page) {
         User user = getCurrentUser();
-        SeriesResponseTMDB shows = tmdbService.getPopularTvShows(page,user);
+        SeriesResponseTMDB shows = tmdbService.getPopularTvShows(page, user);
         return ResponseEntity.ok(shows);
     }
 
@@ -75,7 +72,7 @@ public class TMDBController {
             @RequestParam(defaultValue = "day") String timeWindow,
             @RequestParam(defaultValue = "1") int page) {
         User user = getCurrentUser();
-        SeriesResponseTMDB shows = tmdbService.getTrendingTvShows(timeWindow, page,user);
+        SeriesResponseTMDB shows = tmdbService.getTrendingTvShows(timeWindow, page, user);
         return ResponseEntity.ok(shows);
     }
 
@@ -84,18 +81,17 @@ public class TMDBController {
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int page) {
         User user = getCurrentUser();
-        return ResponseEntity.ok(tmdbService.searchTvShows(query, page,user));
+        return ResponseEntity.ok(tmdbService.searchTvShows(query, page, user));
     }
 
     @GetMapping("/api/search/multi")
     public ResponseEntity<SearchResultsMoviesAndTV> searchAll(
             @RequestParam String query
-    )
-    {
+    ) {
         User user = getCurrentUser();
-        MoviesResponseTMDB results = tmdbService.searchMovie(query,1, user);
-        SeriesResponseTMDB resultstv = tmdbService.searchTvShows(query, 1,user);
-        SearchResultsMoviesAndTV all = new SearchResultsMoviesAndTV(results.results(),resultstv.results());
+        MoviesResponseTMDB results = tmdbService.searchMovie(query, 1, user);
+        SeriesResponseTMDB resultstv = tmdbService.searchTvShows(query, 1, user);
+        SearchResultsMoviesAndTV all = new SearchResultsMoviesAndTV(results.results(), resultstv.results());
         return ResponseEntity.ok(all);
     }
 
@@ -162,19 +158,19 @@ public class TMDBController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int limit) {
         User user = getCurrentUser();
-        GenreDetailSeriesTMDB detail = tmdbService.getGenreDetailSeries(id, page, limit,user);
+        GenreDetailSeriesTMDB detail = tmdbService.getGenreDetailSeries(id, page, limit, user);
         if (detail == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(detail);
     }
 
-    @GetMapping ("/api/movies/categories")
+    @GetMapping("/api/movies/categories")
     public ResponseEntity<List<Genre>> getAllGenres() {
         return ResponseEntity.ok(tmdbService.getAllGenres());
     }
 
-    @GetMapping ("/api/tv/categories")
+    @GetMapping("/api/tv/categories")
     public ResponseEntity<List<Genre>> getAllTVGenres() {
         return ResponseEntity.ok(tmdbService.getAllTVGenres());
     }
@@ -183,18 +179,8 @@ public class TMDBController {
         try {
             User user = userService.getCurrentUser();
             return user;
-        }
-        catch(NoUserAuthenticated | UsernameNotFoundException ex)
-        {
+        } catch (NoUserAuthenticated | UsernameNotFoundException ex) {
             return null;
         }
     }
-
-   /* private String getCurrentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof UserDetails) {
-            return ((UserDetails) auth.getPrincipal()).getUsername();
-        }
-        return null; // ✅ No autenticado
-    }*/
 }

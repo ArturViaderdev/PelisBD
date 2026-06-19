@@ -19,7 +19,6 @@ public class MovieServiceImpl implements MovieService {
     public Movie saveIfNotExists(MovieTMDB tmdbMovie, String mediaType) {
         return movieRepository.findByTmdbId(tmdbMovie.getId())
                 .map(movie -> {
-                    // Si ya existe, actualiza solo si cambió
                     if (needsUpdate(movie, tmdbMovie)) {
                         updateMovie(movie, tmdbMovie);
                         return movieRepository.save(movie);

@@ -8,4 +8,5 @@ public record EpisodeProgressDto(
         Integer episodeNumber,
         Boolean watched,
         LocalDateTime watchedAt
-) {}
+) {
+}

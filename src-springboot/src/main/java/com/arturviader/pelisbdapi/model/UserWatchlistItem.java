@@ -25,23 +25,47 @@ public class UserWatchlistItem {
     private LocalDateTime addedAt;
 
     // Getters y setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public MediaType getType() { return type; }
-    public void setType(MediaType type) { this.type = type; }
+    public User getUser() {
+        return user;
+    }
 
-    public Long getItemId() { return itemId; }
-    public void setItemId(Long itemId) { this.itemId = itemId; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-    public LocalDateTime getAddedAt() { return addedAt; }
-    public void setAddedAt(LocalDateTime addedAt) { this.addedAt = addedAt; }
+    public MediaType getType() {
+        return type;
+    }
 
-    public UserWatchlistItem()
-    {
+    public void setType(MediaType type) {
+        this.type = type;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
+    }
+
+    public LocalDateTime getAddedAt() {
+        return addedAt;
+    }
+
+    public void setAddedAt(LocalDateTime addedAt) {
+        this.addedAt = addedAt;
+    }
+
+    public UserWatchlistItem() {
         addedAt = LocalDateTime.now();
     }
 }

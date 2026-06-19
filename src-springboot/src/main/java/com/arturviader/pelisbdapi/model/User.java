@@ -5,9 +5,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
-@Table(name="users",
-        uniqueConstraints= {
-                @UniqueConstraint(columnNames="email"),
+@Table(name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "email"),
                 @UniqueConstraint(columnNames = "user_name")
         })
 public class User {
@@ -16,18 +16,18 @@ public class User {
     private Long id;
     @NotBlank
     @Email
-    @Column(nullable=false,unique=true)
+    @Column(nullable = false, unique = true)
     private String email;
     @NotBlank
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String password;
     @NotBlank
-    @Column(name="user_name",nullable=false,unique=true)
+    @Column(name = "user_name", nullable = false, unique = true)
     private String userName;
     @Enumerated(EnumType.STRING)
-    @Column(nullable=false)
+    @Column(nullable = false)
     private Role role;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private boolean enabled;
 
     public Long getId() {
