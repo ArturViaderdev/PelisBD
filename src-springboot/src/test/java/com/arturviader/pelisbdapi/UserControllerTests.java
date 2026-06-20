@@ -49,7 +49,7 @@ public class UserControllerTests {
         String body = emailServiceForTests.getLastText();
         String token = body.substring(body.indexOf("token=") + 6);
         Assertions.assertNotNull(token);
-        mockMvc.perform(get("/api/auth/confirmemail")
+        mockMvc.perform(post("/api/auth/confirmemail")
                         .param("token", token))
                 .andExpect(status().isOk());
         MvcResult result = mockMvc.perform(post("/api/auth/login")
@@ -153,7 +153,8 @@ public class UserControllerTests {
                 .andExpect(status().isCreated());
         String body = emailServiceForTests.getLastText();
         String token = body.substring(body.indexOf("token=") + 6);
-        mockMvc.perform(get("/api/auth/confirmemail")
+        System.out.println(token);
+        mockMvc.perform(post("/api/auth/confirmemail")
                         .param("token", token))
                 .andExpect(status().isOk());
         mockMvc.perform(post("/api/auth/login")
@@ -168,7 +169,7 @@ public class UserControllerTests {
     @Test
     @Transactional
     public void confirmEmailInvalidTokenTest() throws Exception {
-        mockMvc.perform(get("/api/auth/confirmemail")
+        mockMvc.perform(post("/api/auth/confirmemail")
                         .param("token", "token-invalido"))
                 .andExpect(status().isNotFound());
     }

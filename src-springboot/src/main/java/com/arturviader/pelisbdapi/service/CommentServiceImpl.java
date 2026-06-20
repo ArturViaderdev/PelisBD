@@ -109,13 +109,13 @@ public class CommentServiceImpl implements CommentService {
         boolean hasSearch = search != null && !search.isBlank();
         if (hasType && hasSearch) {
             page = commentRepository.findByItemTypeAndCommentTextContainingIgnoreCase(
-                    MediaType.valueOf(type.toUpperCase()),
+                    MediaType.valueOf(type.toLowerCase()),
                     search,
                     pageable
             );
         } else if (hasType) {
             page = commentRepository.findByItemType(
-                    MediaType.valueOf(type.toUpperCase()),
+                    MediaType.valueOf(type.toLowerCase()),
                     pageable
             );
         } else if (hasSearch) {
