@@ -3,6 +3,7 @@ package com.arturviader.pelisbdapi;
 import com.arturviader.pelisbdapi.model.MediaType;
 import com.arturviader.pelisbdapi.model.Review;
 import com.arturviader.pelisbdapi.repository.ReviewRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,8 +24,13 @@ class ReviewRepositoryTests {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @BeforeEach
+    public void clean(){
+        reviewRepository.deleteAll();
+    }
+
     @Test
-    void findByUserIdAndTmdbIdAndMediaType_shouldReturnReview() {
+    public void findByUserIdAndTmdbIdAndMediaType_shouldReturnReview() {
         Review review = new Review();
         review.setUserId("artur2");
         review.setTmdbId(123L);
@@ -41,7 +47,7 @@ class ReviewRepositoryTests {
     }
 
     @Test
-    void findAverageRatingByTmdbIdAndMediaType_shouldReturnAverage() {
+    public void findAverageRatingByTmdbIdAndMediaType_shouldReturnAverage() {
         Review r1 = new Review();
         r1.setUserId("u1");
         r1.setTmdbId(123L);
@@ -59,7 +65,7 @@ class ReviewRepositoryTests {
     }
 
     @Test
-    void countTotalRatingsByTmdbIdAndMediaType_shouldReturnCount() {
+    public void countTotalRatingsByTmdbIdAndMediaType_shouldReturnCount() {
         Review r1 = new Review();
         r1.setUserId("u1");
         r1.setTmdbId(123L);
