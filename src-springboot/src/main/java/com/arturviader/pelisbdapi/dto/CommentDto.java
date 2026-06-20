@@ -25,11 +25,9 @@ public class CommentDto {
         this.isEditable = isEditable;
     }
 
-    public CommentDto()
-    {
+    public CommentDto() {
 
     }
-
 
     public Long getUserId() {
         return userId;

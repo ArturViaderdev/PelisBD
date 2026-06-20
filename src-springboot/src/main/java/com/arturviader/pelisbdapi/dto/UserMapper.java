@@ -4,8 +4,7 @@ import com.arturviader.pelisbdapi.model.Role;
 import com.arturviader.pelisbdapi.model.User;
 
 public class UserMapper {
-    public static User toEntity(NewUserRequest request)
-    {
+    public static User toEntity(NewUserRequest request) {
         User user = new User();
         user.setEmail(request.email());
         user.setUserName(request.userName());
@@ -15,8 +14,7 @@ public class UserMapper {
         return user;
     }
 
-    public static UserResponse toDto(User user)
-    {
-        return new UserResponse(user.getId(),user.getEmail(),user.getUserName(),user.getRole().toString());
+    public static UserResponse toDto(User user) {
+        return new UserResponse(user.getId(), user.getEmail(), user.getUserName(), user.getRole().toString());
     }
 }

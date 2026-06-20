@@ -1,6 +1,5 @@
 package com.arturviader.pelisbdapi.service;
 
-import com.arturviader.pelisbdapi.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -26,7 +25,6 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // ✅ Cambiado: acepta UserDetails (no User)
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
                 .subject(userDetails.getUsername()) // ✅ Usa email como subject

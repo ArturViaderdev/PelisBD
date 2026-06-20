@@ -15,6 +15,26 @@ services:
     networks:
       - app-network
 
+  backendpelis:
+    build:
+      context: ./src-springboot
+      dockerfile: ../build/springboot/Dockerfile
+    container_name: backend-pelis
+    restart: always
+    depends_on:
+      - dbpelis
+    ports:
+      - "3000:3000"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dbpelis:5432/pelisbd
+      SPRING_DATASOURCE_USERNAME: admindevartur
+      SPRING_DATASOURCE_PASSWORD: A82zvm-123Y8
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - app-network
+    env_file:
+      - .env.local
+
   webpelis:
     build:
       context: .

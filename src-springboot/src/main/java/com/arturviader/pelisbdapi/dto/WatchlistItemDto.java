@@ -14,4 +14,5 @@ public record WatchlistItemDto(
         @JsonProperty("media_type") String mediaType,
         @JsonProperty("watchListed") boolean isWatchListed,
         @JsonProperty("watched") boolean isWatched
-) {}
+) {
+}

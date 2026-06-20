@@ -1,7 +1,6 @@
 package com.arturviader.pelisbdapi.service;
 
 import org.springframework.context.annotation.Profile;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +15,6 @@ public class EmailServiceForTests implements EmailService {
     }
 
     public void send(String to, String subject, String text) {
-        System.out.println("Sending email to " + to);
-        System.out.println("Subject: " + subject);
-        System.out.println("Text:" + text);
         this.lastText = text;
     }
 
@@ -26,7 +22,7 @@ public class EmailServiceForTests implements EmailService {
         return lastText;
     }
 
-    public void clear(){
+    public void clear() {
         this.lastText = null;
     }
 }

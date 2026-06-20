@@ -22,6 +22,9 @@ import SeasonDetail from './pages/SeasonDetail';
 import EpisodeDetail from './pages/EpisodeDetail';
 import SearchResultsTV from './pages/SearchResultsTV';
 import SearchPage from './pages/SearchPage';
+import ConfirmEmail from './pages/ConfirmEmail';
+import AdminRoute from './routes/AdminRoute';
+import AdminCommentsPage from './pages/AdminCommentsPage';
 
 // Componente de ruta privada
 function PrivateRoute({ children }) {
@@ -50,7 +53,10 @@ function App() {
           <Route path="/tv/category/:id" element={<CategoryTV />} />
           <Route path="/search-tv" element={<SearchResultsTV />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/confirm-email" element={<ConfirmEmail />} />
+          <Route path="/tv/:id/season/:seasonNumber" element={<SeasonDetail />} />
           <Route path="/tv/:id/season/:seasonNumber/episode/:episodeNumber" element={<EpisodeDetail />}
+          
         
           
 />
@@ -71,9 +77,13 @@ function App() {
               </PrivateRoute>
             }
           />
-
-          {/* ✅ Nueva ruta: Detalle de temporada */}
-          <Route path="/tv/:id/season/:seasonNumber" element={<SeasonDetail />} />
+          
+         <Route element={<AdminRoute />}>
+        <Route path="/admin/comments" element={<AdminCommentsPage />} />
+        </Route>
+          
+         
+          
         </Routes>
       </main>
       <Footer />

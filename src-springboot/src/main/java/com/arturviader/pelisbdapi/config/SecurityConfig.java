@@ -8,8 +8,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,9 +23,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     private final JwtAuthenticationFilter jwtAuthFilter;
-    private final JwtUserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -40,13 +38,12 @@ public class SecurityConfig {
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, JwtUserDetailsService userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
-        this.userDetailsService = userDetailsService;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -56,7 +53,7 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/confirmemail",
                                 "/error",
-                                "/api/movies/popular/{page}", //Endpoint que no detecta el login, necesita poder ser accedido tanto desde usuario no logeado como logeado
+                                "/api/movies/popular/{page}",
                                 "/api/movies/{id}",
                                 "/api/movies/trending",
                                 "/api/movies/categories",
@@ -72,9 +69,6 @@ public class SecurityConfig {
                                 "/api/search/movie",
                                 "/api/search/tv"
                         ).permitAll()
-
-                        // ✅ Rutas protegidas: requieren ROLE_USER
-                        //endpoints que detectan el login
                         .requestMatchers(
                                 "/api/user/watched",
                                 "/api/user/watched/{type}/{itemId}",
@@ -91,14 +85,14 @@ public class SecurityConfig {
                                 "/api/reviews/{type}/{id}/rate",
                                 "/api/reviews/{type}/{id}/ratings",
                                 "/api/reviews/{type}/{itemId}/comments",
-                                "/api/reviews/comments/{commentId}"
-
+                                "/api/reviews/comments/{commentId}",
+                                "/api/user/tv/{tvId}/episode",
+                                "/api/user/tv/{tvId}/season/{seasonNumber}"
                         ).hasAnyAuthority("ROLE_USER")
-
+                        .requestMatchers("/api/admin/comments","/api/admin/comments/{commentId}").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
@@ -109,7 +103,6 @@ public class SecurityConfig {
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

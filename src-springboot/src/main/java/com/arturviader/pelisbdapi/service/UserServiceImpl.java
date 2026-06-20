@@ -7,9 +7,9 @@ import com.arturviader.pelisbdapi.model.VerificationToken;
 import com.arturviader.pelisbdapi.repository.UserRepository;
 import com.arturviader.pelisbdapi.repository.VerificationTokenRepository;
 import com.arturviader.pelisbdapi.security.JwtUserDetails;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,14 +28,16 @@ public class UserServiceImpl implements UserService{
     private final JwtService jwtService;
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
+    private final Environment environment;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenRepository verificationTokenRepository, JwtService jwtService, EmailService emailService, AuthenticationManager authenticationManager) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenRepository verificationTokenRepository, JwtService jwtService, EmailService emailService, AuthenticationManager authenticationManager, Environment environment) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.verificationTokenRepository = verificationTokenRepository;
         this.jwtService = jwtService;
         this.emailService = emailService;
         this.authenticationManager = authenticationManager;
+        this.environment = environment;
     }
 
     @Override
@@ -46,59 +48,42 @@ public class UserServiceImpl implements UserService{
         if (userRepository.existsByUserName(dto.userName())){
             throw new AlreadyRegistreredUserName();
         }
-
         User user = UserMapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-
         String token = UUID.randomUUID().toString();
-
         VerificationToken verificationToken = new VerificationToken();
         verificationToken.setToken(token);
         verificationToken.setUser(user);
         verificationToken.setExpiresAt(LocalDateTime.now().plusHours(24));
-
         verificationTokenRepository.save(verificationToken);
-
-        String link = "http://localhost:3000/api/auth/confirmemail?token=" + token;
-
+        String link = environment.getProperty("app.frontend.url");
+        link =  link + "/confirm-email?token=" + token;
         emailService.send(
                 user.getEmail(),
                 "Confirma tu cuenta",
-                "Haz clic en el siguiente enlace para activar tu cuenta: " + link
+                "Bienvenido a PelisBD Haz clic en el siguiente enlace para activar tu cuenta: " + link
         );
-
         return UserMapper.toDto(user);
     }
 
     @Override
     public JwtResponse loginUser(LoginRequest dto) {
-        System.out.println("🔍 Buscando usuario service con: '" + dto.email() + "'");
         User user = userRepository.findByEmail(dto.email())
                 .orElseThrow(UserNotFound::new);
-
         if (!user.isEnabled()) {
             throw new EmailNotConfirmed();
         }
-
-
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
             throw new BadCredentialsException("Invalid password");
         }
-
-
         UserDetails userDetails = new JwtUserDetails(user);
-
-
         String jwt = jwtService.generateToken(userDetails);
-
-
         String role = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .findFirst()
                 .map(auth -> auth.replace("ROLE_", ""))
                 .orElse("USER");
-
         return new JwtResponse(
                 jwt,
                 "Bearer",
@@ -108,7 +93,6 @@ public class UserServiceImpl implements UserService{
                 role
         );
     }
-
 
     @Override
     public void confirmEmail(String token) {
@@ -122,7 +106,6 @@ public class UserServiceImpl implements UserService{
         User user = verificationToken.getUser();
         user.setEnabled(true);
         userRepository.save(user);
-
         verificationTokenRepository.delete(verificationToken);
     }
 
@@ -138,6 +121,6 @@ public class UserServiceImpl implements UserService{
             throw new NoUserAuthenticated();
         }
         return userRepository.findByUserName(username)
-                .orElseThrow(() -> new UserNotFound());
+                .orElseThrow(UserNotFound::new);
     }
 }

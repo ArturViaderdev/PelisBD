@@ -13,7 +13,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {
-
     @Autowired
     private UserService userService;
 
@@ -28,14 +27,12 @@ public class ReviewController {
 
         Integer rating = request.get("rating");
         if (rating == null || rating < 1 || rating > 5) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Rating must be between 1 and 5"));
+            return ResponseEntity.badRequest().body(Map.of("error", "La puntuación debe ser del 1 al 5."));
         }
 
         String userId = getCurrentUser().getUserName();
-
         Review review = reviewService.rateItem(userId, id, type, rating);
         Map<String, Object> ratings = reviewService.getRatings(userId, id, type);
-
         return ResponseEntity.ok(ratings);
     }
 
@@ -43,11 +40,8 @@ public class ReviewController {
     public ResponseEntity<Map<String, Object>> getItemRatings(
             @PathVariable String type,
             @PathVariable Long id) {
-
         String userId = getCurrentUser().getUserName();
-
         Map<String, Object> ratings = reviewService.getRatings(userId, id, type);
-
         return ResponseEntity.ok(ratings);
     }
 

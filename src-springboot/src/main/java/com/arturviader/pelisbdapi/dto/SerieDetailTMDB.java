@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class SerieDetailTMDB extends SerieTMDB{
+public class SerieDetailTMDB extends SerieTMDB {
     @JsonProperty("backdrop_path")
     private String backdropPath;
 

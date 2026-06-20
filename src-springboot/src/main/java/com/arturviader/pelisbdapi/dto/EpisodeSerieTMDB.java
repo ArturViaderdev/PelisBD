@@ -11,6 +11,7 @@ public class EpisodeSerieTMDB {
     private String overview;
     @JsonProperty("air_date")
     private String airDate;
+    private boolean watched;
 
 
     public EpisodeSerieTMDB(Integer episodeNumber, String name, String overview, String airDate) {
@@ -19,6 +20,14 @@ public class EpisodeSerieTMDB {
         this.overview = overview;
         this.airDate = airDate;
 
+    }
+
+    public boolean isWatched() {
+        return watched;
+    }
+
+    public void setWatched(boolean watched) {
+        this.watched = watched;
     }
 
     public Integer getEpisodeNumber() {

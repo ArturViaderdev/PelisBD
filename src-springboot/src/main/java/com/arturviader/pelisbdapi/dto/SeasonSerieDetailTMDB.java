@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class SeasonSerieDetailTMDB extends SeasonSerieTMDB{
+public class SeasonSerieDetailTMDB extends SeasonSerieTMDB {
     private List<EpisodeSerieTMDB> episodes;
     private String posterPath;
     private String overview;

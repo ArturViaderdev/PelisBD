@@ -1,9 +1,9 @@
-package com.arturviader.pelisbdapi.dto;
+package com.arturviader.pelisbdapi.mapper;
 
+import com.arturviader.pelisbdapi.dto.WatchedItemDto;
 import com.arturviader.pelisbdapi.model.*;
 import com.arturviader.pelisbdapi.service.MovieService;
 import com.arturviader.pelisbdapi.service.TvService;
-import com.arturviader.pelisbdapi.service.UserMediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +20,7 @@ public class UserWatchedMapper {
 
     public WatchedItemDto toDtoWithMovieData(UserWatchedItem item, boolean isInWatchList) {
         String mediaType = item.getType().name();
-        if(item.getType().equals(MediaType.movie))
-        {
+        if (item.getType().equals(MediaType.movie)) {
             var movieOpt = movieService.findById(item.getItemId());
 
             return new WatchedItemDto(
@@ -35,11 +34,9 @@ public class UserWatchedMapper {
                             .orElse(null), // ✅ release_date
                     mediaType,
                     isInWatchList
-                    ,true
+                    , true
             );
-        }
-        else
-        {
+        } else {
             var tvOpt = tvService.findById(item.getItemId());
             return new WatchedItemDto(
                     tvOpt.map(Serie::getTmdbId).orElse(null), // ✅ id = tmdbId
@@ -53,7 +50,7 @@ public class UserWatchedMapper {
                     mediaType // ✅ media_type
                     ,
                     isInWatchList
-                    ,true
+                    , true
             );
         }
 

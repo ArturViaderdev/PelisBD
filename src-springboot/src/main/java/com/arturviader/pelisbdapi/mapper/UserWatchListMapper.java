@@ -1,9 +1,9 @@
-package com.arturviader.pelisbdapi.dto;
+package com.arturviader.pelisbdapi.mapper;
 
+import com.arturviader.pelisbdapi.dto.WatchlistItemDto;
 import com.arturviader.pelisbdapi.model.*;
 import com.arturviader.pelisbdapi.service.MovieService;
 import com.arturviader.pelisbdapi.service.TvService;
-import com.arturviader.pelisbdapi.service.UserMediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,9 +35,7 @@ public class UserWatchListMapper {
                     watched
             );
 
-        }
-        else
-        {
+        } else {
             var tvOpt = tvService.findById(item.getItemId());
             return new WatchlistItemDto(
                     tvOpt.map(Serie::getTmdbId).orElse(null),

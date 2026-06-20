@@ -11,5 +11,4 @@ public record WatchListResponse(
         boolean last,
         boolean first
 ) {
-
 }
