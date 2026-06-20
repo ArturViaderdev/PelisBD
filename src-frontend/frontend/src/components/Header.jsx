@@ -108,6 +108,14 @@ export default function Header() {
                 >
                   Visto
                 </Link>
+                  {user.role === 'ADMIN' && (
+                <Link
+                  to="/admin/comments"
+                  className="hover:text-primary transition-colors"
+                >
+                Admin comentarios
+                </Link>
+                )}
                 <div className="flex items-center gap-3">
                   <FiUser className="text-gray-400" />
                   <span className="text-sm">{user.name}</span>

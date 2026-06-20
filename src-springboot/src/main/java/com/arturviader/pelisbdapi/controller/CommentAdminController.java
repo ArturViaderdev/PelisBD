@@ -1,8 +1,12 @@
 package com.arturviader.pelisbdapi.controller;
 
+import com.arturviader.pelisbdapi.dto.CommentAdminDto;
 import com.arturviader.pelisbdapi.dto.CommentDto;
 import com.arturviader.pelisbdapi.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -11,22 +15,29 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/comments")
-@PreAuthorize("hasRole('ADMIN')")
+@CrossOrigin(origins = "*")
 public class CommentAdminController {
 
-    @Autowired
-    private CommentService commentService;
+    private final CommentService commentService;
+
+    public CommentAdminController(CommentService commentService) {
+        this.commentService = commentService;
+    }
 
     @GetMapping
-    public List<CommentDto> getAllComments() {
-        //return commentService.getAllComments();
-        return null;
+    public ResponseEntity<Page<CommentAdminDto>> getAllComments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String search
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(commentService.getAllCommentsAdmin(type, search, pageable));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long id) {
-        commentService.deleteComment(id);
-        return ResponseEntity.ok("Comentario eliminado");
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
+        commentService.deleteComment(commentId);
+        return ResponseEntity.noContent().build();
     }
 }
-

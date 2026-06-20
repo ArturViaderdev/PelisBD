@@ -1,7 +1,9 @@
 package com.arturviader.pelisbdapi.service;
 
+import com.arturviader.pelisbdapi.dto.CommentAdminDto;
 import com.arturviader.pelisbdapi.dto.CommentDto;
 import com.arturviader.pelisbdapi.exception.*;
+import com.arturviader.pelisbdapi.mapper.CommentAdminMapper;
 import com.arturviader.pelisbdapi.mapper.CommentMapper;
 import com.arturviader.pelisbdapi.model.Comment;
 import com.arturviader.pelisbdapi.model.MediaType;
@@ -10,6 +12,8 @@ import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.repository.CommentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -57,8 +61,9 @@ public class CommentServiceImpl implements CommentService {
         List<Comment> comments = onlyPublic
                 ? commentRepository.findByItemIdAndItemTypeAndIsPublicTrue(itemId, type)
                 : commentRepository.findByItemIdAndItemType(itemId, type);
+        boolean isAdmin = user != null && user.getRole().equals(Role.ADMIN);
         return comments.stream()
-                .filter(c -> c.isPublic() || c.getUser().getId().equals(user.getId()))
+                .filter(c -> isAdmin || c.isPublic() || c.getUser().getId().equals(user.getId()))
                 .map(c -> CommentMapper.toDto(c, c.getUser()))
                 .collect(Collectors.toList());
     }
@@ -97,12 +102,27 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.toDto(updated, updated.getUser());
     }
 
-    /*@Override
-    public List<CommentDto> getAllComments() {
-        List<Comment> comments = commentRepository.findAll();
-        List<CommentDto> dto = new ArrayList<>();
-        for(Comment comment:comments){
-
+    @Override
+    public Page<CommentAdminDto> getAllCommentsAdmin(String type, String search, Pageable pageable) {
+        Page<Comment> page;
+        boolean hasType = type != null && !type.isBlank();
+        boolean hasSearch = search != null && !search.isBlank();
+        if (hasType && hasSearch) {
+            page = commentRepository.findByItemTypeAndCommentTextContainingIgnoreCase(
+                    MediaType.valueOf(type.toUpperCase()),
+                    search,
+                    pageable
+            );
+        } else if (hasType) {
+            page = commentRepository.findByItemType(
+                    MediaType.valueOf(type.toUpperCase()),
+                    pageable
+            );
+        } else if (hasSearch) {
+            page = commentRepository.findByCommentTextContainingIgnoreCase(search, pageable);
+        } else {
+            page = commentRepository.findAll(pageable);
         }
-    }*/
+        return page.map(CommentAdminMapper::toDto);
+    }
 }

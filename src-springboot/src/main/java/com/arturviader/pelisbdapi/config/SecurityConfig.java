@@ -89,7 +89,7 @@ public class SecurityConfig {
                                 "/api/user/tv/{tvId}/episode",
                                 "/api/user/tv/{tvId}/season/{seasonNumber}"
                         ).hasAnyAuthority("ROLE_USER")
-                        .requestMatchers("/api/admin/comments").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/comments","/api/admin/comments/{commentId}").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

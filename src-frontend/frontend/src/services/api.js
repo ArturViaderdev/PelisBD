@@ -135,6 +135,16 @@ export const reviewService = {
     api.put(`/reviews/comments/${commentId}`, { text }),
 };
 
+export const adminCommentsService = {
+  getComments: (page = 0, size = 20, type = '', search = '') =>
+    api.get('/admin/comments', {
+      params: { page, size, type, search },
+    }),
+
+  deleteComment: (commentId) =>
+    api.delete(`/admin/comments/${commentId}`),
+};
+
 export const getCategoryList = async () => {
   try {
     const response = api.get('/movies/categories');
