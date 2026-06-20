@@ -3,25 +3,38 @@ package com.arturviader.pelisbdapi;
 import com.arturviader.pelisbdapi.controller.TMDBController;
 import com.arturviader.pelisbdapi.dto.*;
 import com.arturviader.pelisbdapi.model.User;
+import com.arturviader.pelisbdapi.security.ApiKeyValidator;
 import com.arturviader.pelisbdapi.security.JwtUserDetailsService;
 import com.arturviader.pelisbdapi.service.JwtService;
 import com.arturviader.pelisbdapi.service.TMDBService;
 import com.arturviader.pelisbdapi.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
+
 import java.util.List;
+
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TMDBController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class TMDBControllerTests {
+
+    private static final String API_KEY_HEADER = "X-API-Key";
+
+    @Value("${api.key:TEST-API-KEY}")
+    private String apiKey;
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,6 +51,20 @@ class TMDBControllerTests {
     @MockitoBean
     private JwtUserDetailsService jwtUserDetailsService;
 
+    @MockitoBean
+    private ApiKeyValidator apiKeyValidator;
+
+    @BeforeEach
+    void setUpApiKey() {
+        when(apiKeyValidator.isValid(anyString())).thenReturn(true);
+    }
+
+    private RequestPostProcessor apiKeyHeader() {
+        return request -> {
+            request.addHeader(API_KEY_HEADER, apiKey);
+            return request;
+        };
+    }
 
     private User mockUser() {
         User user = new User();
@@ -60,6 +87,8 @@ class TMDBControllerTests {
         when(tmdbService.searchMovie("batman", 1, user)).thenReturn(response);
 
         mockMvc.perform(get("/api/search/movie")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER"))
                         .param("query", "batman")
                         .param("page", "1"))
                 .andExpect(status().isOk())
@@ -88,7 +117,10 @@ class TMDBControllerTests {
                 1000
         );
         when(tmdbService.getMovieDetailWithTrailer(123L)).thenReturn(movie);
-        mockMvc.perform(get("/api/movies/123"))
+
+        mockMvc.perform(get("/api/movies/123")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(123))
                 .andExpect(jsonPath("$.title").value("Batman"))
@@ -99,7 +131,10 @@ class TMDBControllerTests {
     @WithMockUser(username = "artur2", roles = "USER")
     void getMovieById_shouldReturnNotFound_whenMovieDoesNotExist() throws Exception {
         when(tmdbService.getMovieDetailWithTrailer(123L)).thenReturn(null);
-        mockMvc.perform(get("/api/movies/123"))
+
+        mockMvc.perform(get("/api/movies/123")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isNotFound());
     }
 
@@ -115,7 +150,11 @@ class TMDBControllerTests {
         );
         when(userService.getCurrentUser()).thenReturn(user);
         when(tmdbService.getPopularMovies(1, user)).thenReturn(response);
-        mockMvc.perform(get("/api/movies/popular").param("page", "1"))
+
+        mockMvc.perform(get("/api/movies/popular")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER"))
+                        .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results[0].title").value("Movie 1"));
     }
@@ -132,7 +171,10 @@ class TMDBControllerTests {
         );
         when(userService.getCurrentUser()).thenReturn(user);
         when(tmdbService.getTrendingMovies("day", 1, user)).thenReturn(response);
+
         mockMvc.perform(get("/api/movies/trending")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER"))
                         .param("timeWindow", "day")
                         .param("page", "1"))
                 .andExpect(status().isOk())
@@ -152,7 +194,11 @@ class TMDBControllerTests {
 
         when(userService.getCurrentUser()).thenReturn(user);
         when(tmdbService.getPopularTvShows(1, user)).thenReturn(response);
-        mockMvc.perform(get("/api/tv/popular").param("page", "1"))
+
+        mockMvc.perform(get("/api/tv/popular")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER"))
+                        .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results[0].name").value("Breaking Bad"));
     }
@@ -169,7 +215,10 @@ class TMDBControllerTests {
         );
         when(userService.getCurrentUser()).thenReturn(user);
         when(tmdbService.getTrendingTvShows("day", 1, user)).thenReturn(response);
+
         mockMvc.perform(get("/api/tv/trending")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER"))
                         .param("timeWindow", "day")
                         .param("page", "1"))
                 .andExpect(status().isOk())
@@ -188,7 +237,10 @@ class TMDBControllerTests {
         );
         when(userService.getCurrentUser()).thenReturn(user);
         when(tmdbService.searchTvShows("breaking bad", 1, user)).thenReturn(response);
+
         mockMvc.perform(get("/api/search/tv")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER"))
                         .param("query", "breaking bad")
                         .param("page", "1"))
                 .andExpect(status().isOk())
@@ -210,7 +262,10 @@ class TMDBControllerTests {
         when(userService.getCurrentUser()).thenReturn(user);
         when(tmdbService.searchMovie("batman", 1, user)).thenReturn(movies);
         when(tmdbService.searchTvShows("batman", 1, user)).thenReturn(series);
+
         mockMvc.perform(get("/api/search/multi")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER"))
                         .param("query", "batman"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.movies[0].title").value("Batman"))
@@ -237,7 +292,10 @@ class TMDBControllerTests {
                 List.of()
         );
         when(tmdbService.getTvShowDetailWithTrailer(1L)).thenReturn(show);
-        mockMvc.perform(get("/api/tv/1"))
+
+        mockMvc.perform(get("/api/tv/1")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Breaking Bad"));
@@ -247,7 +305,10 @@ class TMDBControllerTests {
     @WithMockUser(username = "artur2", roles = "USER")
     void getTvShowDetail_shouldReturnNotFound_whenShowDoesNotExist() throws Exception {
         when(tmdbService.getTvShowDetailWithTrailer(1L)).thenReturn(null);
-        mockMvc.perform(get("/api/tv/1"))
+
+        mockMvc.perform(get("/api/tv/1")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isNotFound());
     }
 
@@ -265,7 +326,10 @@ class TMDBControllerTests {
         );
 
         when(tmdbService.getSeasonDetail(1L, 1)).thenReturn(season);
-        mockMvc.perform(get("/api/tv/1/season/1"))
+
+        mockMvc.perform(get("/api/tv/1/season/1")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.season_number").value(1))
                 .andExpect(jsonPath("$.name").value("Season 1"));
@@ -275,7 +339,10 @@ class TMDBControllerTests {
     @WithMockUser(username = "artur2", roles = "USER")
     void getSeasonDetail_shouldReturnNotFound_whenSeasonDoesNotExist() throws Exception {
         when(tmdbService.getSeasonDetail(1L, 1)).thenReturn(null);
-        mockMvc.perform(get("/api/tv/1/season/1"))
+
+        mockMvc.perform(get("/api/tv/1/season/1")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isNotFound());
     }
 
@@ -292,7 +359,10 @@ class TMDBControllerTests {
         );
 
         when(tmdbService.getEpisodeDetail(1L, 1, 1)).thenReturn(episode);
-        mockMvc.perform(get("/api/tv/1/season/1/episode/1"))
+
+        mockMvc.perform(get("/api/tv/1/season/1/episode/1")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.episode_number").value(1))
                 .andExpect(jsonPath("$.name").value("Episode 1"));
@@ -302,7 +372,10 @@ class TMDBControllerTests {
     @WithMockUser(username = "artur2", roles = "USER")
     void getEpisodeDetail_shouldReturnNotFound_whenEpisodeDoesNotExist() throws Exception {
         when(tmdbService.getEpisodeDetail(1L, 1, 1)).thenReturn(null);
-        mockMvc.perform(get("/api/tv/1/season/1/episode/1"))
+
+        mockMvc.perform(get("/api/tv/1/season/1/episode/1")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isNotFound());
     }
 
@@ -312,7 +385,10 @@ class TMDBControllerTests {
         when(tmdbService.getMovieVideos(1L)).thenReturn(List.of(
                 new VideoTMDB("1", "en", "Trailer", "YouTube", "1080", "Trailer", "abc123")
         ));
-        mockMvc.perform(get("/api/movies/1/videos"))
+
+        mockMvc.perform(get("/api/movies/1/videos")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].key").value("abc123"));
     }
@@ -323,7 +399,10 @@ class TMDBControllerTests {
         when(tmdbService.getTvShowVideos(1L)).thenReturn(List.of(
                 new VideoTMDB("1", "en", "Trailer", "YouTube", "1080", "Trailer", "xyz789")
         ));
-        mockMvc.perform(get("/api/tv/1/videos"))
+
+        mockMvc.perform(get("/api/tv/1/videos")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].key").value("xyz789"));
     }
@@ -343,7 +422,11 @@ class TMDBControllerTests {
 
         when(userService.getCurrentUser()).thenReturn(user);
         when(tmdbService.getGenreDetail(12L, 1, 20, user)).thenReturn(detail);
-        mockMvc.perform(get("/api/movies/category/12").param("page", "1"))
+
+        mockMvc.perform(get("/api/movies/category/12")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER"))
+                        .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(12))
                 .andExpect(jsonPath("$.name").value("Action"))
@@ -356,7 +439,11 @@ class TMDBControllerTests {
         User user = mockUser();
         when(userService.getCurrentUser()).thenReturn(user);
         when(tmdbService.getGenreDetail(12L, 1, 20, user)).thenReturn(null);
-        mockMvc.perform(get("/api/movies/category/12").param("page", "1"))
+
+        mockMvc.perform(get("/api/movies/category/12")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER"))
+                        .param("page", "1"))
                 .andExpect(status().isNotFound());
     }
 
@@ -364,7 +451,10 @@ class TMDBControllerTests {
     @WithMockUser(username = "artur2", roles = "USER")
     void getAllGenres_shouldReturnOk() throws Exception {
         when(tmdbService.getAllGenres()).thenReturn(List.of());
-        mockMvc.perform(get("/api/movies/categories"))
+
+        mockMvc.perform(get("/api/movies/categories")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isOk());
     }
 
@@ -372,7 +462,10 @@ class TMDBControllerTests {
     @WithMockUser(username = "artur2", roles = "USER")
     void getAllTVGenres_shouldReturnOk() throws Exception {
         when(tmdbService.getAllTVGenres()).thenReturn(List.of());
-        mockMvc.perform(get("/api/tv/categories"))
+
+        mockMvc.perform(get("/api/tv/categories")
+                        .with(apiKeyHeader())
+                        .with(user("artur2").roles("USER")))
                 .andExpect(status().isOk());
     }
 }

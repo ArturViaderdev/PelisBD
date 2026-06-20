@@ -4,24 +4,20 @@ import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.repository.CommentRepository;
 import com.arturviader.pelisbdapi.repository.ReviewRepository;
 import com.arturviader.pelisbdapi.repository.UserRepository;
-import com.arturviader.pelisbdapi.service.ReviewService;
-import com.arturviader.pelisbdapi.service.ReviewServiceImpl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Map;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,7 +29,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-class ReviewControllerIT {
+class ReviewControllerTests {
+
+    private static final String API_KEY_HEADER = "X-API-Key";
+
+    @Value("${api.key:TEST-API-KEY}")
+    private String apiKey;
 
     @Autowired
     private MockMvc mockMvc;
@@ -65,6 +66,7 @@ class ReviewControllerIT {
     @Test
     void rateItem_shouldCreateReviewAndReturnRatings() throws Exception {
         mockMvc.perform(post("/api/reviews/movie/123/rate")
+                        .header(API_KEY_HEADER, apiKey)
                         .with(user("artur2").roles("USER"))
                         .contentType(APPLICATION_JSON)
                         .content("""
@@ -80,6 +82,7 @@ class ReviewControllerIT {
     @Test
     void getItemRatings_shouldReturnEmptyRatingsWhenNoReviewExists() throws Exception {
         mockMvc.perform(get("/api/reviews/movie/123/ratings")
+                        .header(API_KEY_HEADER, apiKey)
                         .with(user("artur2").roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.averageRating").value(0.0))
@@ -91,6 +94,7 @@ class ReviewControllerIT {
     @Test
     void rateItem_shouldReturnBadRequest_whenRatingIsInvalid() throws Exception {
         mockMvc.perform(post("/api/reviews/movie/123/rate")
+                        .header(API_KEY_HEADER, apiKey)
                         .with(user("artur2").roles("USER"))
                         .contentType(APPLICATION_JSON)
                         .content("""

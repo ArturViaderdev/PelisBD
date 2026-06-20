@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.io.IOException;
 
-/*@ControllerAdvice
+@ControllerAdvice
 public class ApiKeyAuthenticationAdvice {
 
     @Autowired
@@ -26,4 +26,4 @@ public class ApiKeyAuthenticationAdvice {
             }
         }
     }
-}*/
+}

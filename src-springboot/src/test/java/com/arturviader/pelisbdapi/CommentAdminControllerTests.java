@@ -10,11 +10,15 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
 import java.time.LocalDateTime;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,7 +29,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class CommentAdminControllerTests {
 
+    private static final String API_KEY_HEADER = "X-API-Key";
+    private static final String TEST_API_KEY = "TEST-API-KEY";
+
     @Autowired
+    private WebApplicationContext context;
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -38,6 +47,11 @@ class CommentAdminControllerTests {
 
     @BeforeEach
     void setUp() {
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .defaultRequest(get("/").header(API_KEY_HEADER, TEST_API_KEY))
+                .build();
+
         commentRepository.deleteAll();
         userRepository.deleteAll();
 
@@ -56,7 +70,7 @@ class CommentAdminControllerTests {
         userRepository.save(userAdmin);
 
         Comment comment = new Comment();
-        comment.setUser(userAdmin); // <-- si quieres que el comentario sea de artur
+        comment.setUser(userAdmin);
         comment.setItemId(123L);
         comment.setItemType(MediaType.movie);
         comment.setCommentText("Comentario de prueba");

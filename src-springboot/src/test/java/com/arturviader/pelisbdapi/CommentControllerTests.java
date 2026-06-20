@@ -12,6 +12,7 @@ import com.arturviader.pelisbdapi.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -19,6 +20,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -35,7 +38,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class CommentControllerTests {
 
+    private static final String API_KEY_HEADER = "X-API-Key";
+    private static final String TEST_API_KEY = "TEST-API-KEY";
+
     @Autowired
+    private WebApplicationContext context;
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -49,8 +57,14 @@ class CommentControllerTests {
 
     @BeforeEach
     void setUp() {
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .defaultRequest(get("/").header(API_KEY_HEADER, TEST_API_KEY))
+                .build();
+
         commentRepository.deleteAll();
         userRepository.deleteAll();
+
         User adminUser = new User();
         adminUser.setEmail("admin@test.com");
         adminUser.setUserName("admin");
@@ -58,6 +72,7 @@ class CommentControllerTests {
         adminUser.setEnabled(true);
         adminUser.setRole(Role.USER);
         userRepository.save(adminUser);
+
         normalUser = new User();
         normalUser.setEmail("artur2@test.com");
         normalUser.setUserName("artur2");
@@ -65,7 +80,9 @@ class CommentControllerTests {
         normalUser.setEnabled(true);
         normalUser.setRole(Role.USER);
         userRepository.save(normalUser);
+
         User persistedUser = userRepository.findByUserName("artur2").orElseThrow();
+
         Comment comment = new Comment();
         comment.setUser(persistedUser);
         comment.setItemId(123L);
@@ -80,9 +97,6 @@ class CommentControllerTests {
     @Test
     @WithMockUser(username = "artur2", roles = "USER")
     void addComment_shouldCreateComment() throws Exception {
-        Map<String, Object> body = new HashMap<>();
-        body.put("text", "Nuevo comentario");
-        body.put("isPublic", true);
         mockMvc.perform(post("/api/reviews/movie/123/comments")
                         .contentType(APPLICATION_JSON)
                         .content("""
@@ -110,6 +124,7 @@ class CommentControllerTests {
     void deleteComment_shouldDeleteComment() throws Exception {
         mockMvc.perform(delete("/api/reviews/comments/{commentId}", savedComment.getId()))
                 .andExpect(status().isNoContent());
+
         assertThat(commentRepository.findById(savedComment.getId())).isEmpty();
     }
 
