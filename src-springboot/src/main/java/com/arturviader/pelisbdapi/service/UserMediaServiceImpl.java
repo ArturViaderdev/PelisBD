@@ -217,10 +217,10 @@ public class UserMediaServiceImpl implements UserMediaService {
         int initialResult = (page - 1) * size;
         int endResult = initialResult + size;
         if (endResult > totalElements) {
-            endResult = totalElements - 1;
+            endResult = totalElements ;
         }
         List<UserWatchlistItem> results = new ArrayList<>();
-        for (int count = initialResult; count <= endResult; count++) {
+        for (int count = initialResult; count < endResult; count++) {
             results.add(watchListItems.get(count));
         }
         List<WatchlistItemDto> itemsdto = results.stream()
@@ -250,10 +250,10 @@ public class UserMediaServiceImpl implements UserMediaService {
         int initialResult = (page - 1) * size;
         int endResult = initialResult + size;
         if (endResult > totalElements) {
-            endResult = totalElements - 1;
+            endResult = totalElements;
         }
         List<UserWatchedItem> results = new ArrayList<>();
-        for (int count = initialResult; count <= endResult; count++) {
+        for (int count = initialResult; count < endResult; count++) {
             results.add(watchedItems.get(count));
         }
         List<WatchedItemDto> itemsdto = results.stream()
