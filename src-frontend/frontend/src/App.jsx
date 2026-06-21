@@ -26,19 +26,17 @@ import ConfirmEmail from './pages/ConfirmEmail';
 import AdminRoute from './routes/AdminRoute';
 import AdminCommentsPage from './pages/AdminCommentsPage';
 
-// Componente de ruta privada
 function PrivateRoute({ children }) {
   const { isAuthenticated } = useAuthStore();
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
 function App() {
   return (
-    <Router>
+    <Router basename="/">
       <Header />
       <main className="flex-1 bg-gray-950 text-white">
         <Routes>
-          {/* Rutas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -55,12 +53,11 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/confirm-email" element={<ConfirmEmail />} />
           <Route path="/tv/:id/season/:seasonNumber" element={<SeasonDetail />} />
-          <Route path="/tv/:id/season/:seasonNumber/episode/:episodeNumber" element={<EpisodeDetail />}
-          
-        
-          
-/>
-          {/* Rutas privadas */}
+          <Route
+            path="/tv/:id/season/:seasonNumber/episode/:episodeNumber"
+            element={<EpisodeDetail />}
+          />
+
           <Route
             path="/watchlist"
             element={
@@ -77,13 +74,10 @@ function App() {
               </PrivateRoute>
             }
           />
-          
-         <Route element={<AdminRoute />}>
-        <Route path="/admin/comments" element={<AdminCommentsPage />} />
-        </Route>
-          
-         
-          
+
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/comments" element={<AdminCommentsPage />} />
+          </Route>
         </Routes>
       </main>
       <Footer />
