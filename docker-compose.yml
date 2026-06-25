@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   dbpelis:
     image: postgres:16
@@ -12,9 +11,9 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./build/postgree/testdatabase.sql:/docker-entrypoint-initdb.d/testdatabase.sql:ro
     networks:
       - app-network
-
   webpelis:
     build:
       context: .

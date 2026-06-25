@@ -13,9 +13,9 @@ export default function Footer() {
             <h4 className="text-white font-bold mb-4">Enlaces</h4>
             <ul className="space-y-2 text-sm">
               <li><a href="#" className="hover:text-white transition">Inicio</a></li>
-              <li><a href="#" className="hover:text-white transition">Películas</a></li>
-              <li><a href="#" className="hover:text-white transition">Series</a></li>
-              <li><a href="#" className="hover:text-white transition">Contacto</a></li>
+              <li><a href="/movies" className="hover:text-white transition">Películas</a></li>
+              <li><a href="/tv" className="hover:text-white transition">Series</a></li>
+              <li><a href="/contacto" className="hover:text-white transition">Contacto</a></li>
             </ul>
           </div>
           <div>

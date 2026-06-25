@@ -1,0 +1,126 @@
+package com.arturviader.pelisbdapi.config;
+
+import com.arturviader.pelisbdapi.security.JwtAuthenticationFilter;
+import com.arturviader.pelisbdapi.security.JwtUserDetailsService;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Value("${FRONTEND_URL}")
+    private String frontendUrl;
+    private final JwtAuthenticationFilter jwtAuthFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, JwtUserDetailsService userDetailsService) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(
+                                "/api/auth/register",
+                                "/api/auth/login",
+                                "/api/auth/confirmemail",
+                                "/error",
+                                "/api/movies/popular/{page}",
+                                "/api/movies/{id}",
+                                "/api/movies/trending",
+                                "/api/movies/categories",
+                                "/api/movies/category/{page}",
+                                "/api/tv/popular/{page}",
+                                "/api/tv/trending",
+                                "/api/tv/{id}",
+                                "/api/tv/category/{id}",
+                                "/api/tv/categories",
+                                "/api/tv/{id}/season/{seasonNumber}",
+                                "/api/tv/{id}/season/{seasonNumber}/episode/{episodeNumber}",
+                                "/api/search/multi",
+                                "/api/search/movie",
+                                "/api/search/tv",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/docs/api-docs/**"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/api/user/watched",
+                                "/api/user/watched/{type}/{itemId}",
+                                "/api/user/watched/status/{type}/{tmbdId}",
+                                "/api/user/watchlist",
+                                "/api/user/watchlist/{type}/{itemId}",
+                                "/api/user/watchlist/status/{type}/{tmbdId}",
+                                "/api/user/tv/{tvId}/episode",
+                                "/api/user/tv/{tvId}/season",
+                                "/api/user/tv/{tvId}",
+                                "/api/user/watched/{tmdbId}",
+                                "/api/user/watchlist/{tmbdId}",
+                                "/api/user/watchlist/{type}/{itemId}",
+                                "/api/reviews/{type}/{id}/rate",
+                                "/api/reviews/{type}/{id}/ratings",
+                                "/api/reviews/{type}/{itemId}/comments",
+                                "/api/reviews/comments/{commentId}",
+                                "/api/user/tv/{tvId}/episode",
+                                "/api/user/tv/{tvId}/season/{seasonNumber}"
+                        ).hasRole("USER")
+                        .requestMatchers("/api/admin/comments", "/api/admin/comments/{commentId}").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+}

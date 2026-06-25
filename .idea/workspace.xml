@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ea404c1a-31b9-4168-8b26-caf00f2d56c1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-frontend/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src-frontend/frontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-frontend/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src-frontend/frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-frontend/frontend/src/components/Footer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src-frontend/frontend/src/components/Footer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-frontend/frontend/src/components/MovieCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src-frontend/frontend/src/components/MovieCard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-frontend/frontend/src/components/TVShowCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src-frontend/frontend/src/components/TVShowCard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-frontend/frontend/src/services/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/src-frontend/frontend/src/services/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-frontend/frontend/vite.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/src-frontend/frontend/vite.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-springboot/src/main/java/com/arturviader/pelisbdapi/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src-springboot/src/main/java/com/arturviader/pelisbdapi/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-springboot/src/main/java/com/arturviader/pelisbdapi/security/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src-springboot/src/main/java/com/arturviader/pelisbdapi/security/JwtAuthenticationFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-springboot/src/main/java/com/arturviader/pelisbdapi/service/UserMediaServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src-springboot/src/main/java/com/arturviader/pelisbdapi/service/UserMediaServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src-springboot/src/test/java/com/arturviader/pelisbdapi/TMDBControllerTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src-springboot/src/test/java/com/arturviader/pelisbdapi/TMDBControllerTests.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7,
+  "fromUser": false
+}]]></component>
+  <component name="ProjectId" id="3FdXJ7VZKtw35AMgbRLgP0p9EzC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "develop",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/ryzenpc/Documentos/cybernarium/pelis/dev/PelisBDEntrega/PelisBD",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.25134.95" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.25134.95" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ea404c1a-31b9-4168-8b26-caf00f2d56c1" name="Changes" comment="" />
+      <created>1782405844621</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1782405844621</updated>
+      <workItem from="1782405845650" duration="9000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
