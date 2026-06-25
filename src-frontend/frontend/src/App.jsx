@@ -24,6 +24,7 @@ import SearchResultsTV from './pages/SearchResultsTV';
 import SearchPage from './pages/SearchPage';
 import ConfirmEmail from './pages/ConfirmEmail';
 import AdminRoute from './routes/AdminRoute';
+import Contacto from './pages/Contacto';
 import AdminCommentsPage from './pages/AdminCommentsPage';
 
 function PrivateRoute({ children }) {
@@ -52,6 +53,7 @@ function App() {
           <Route path="/search-tv" element={<SearchResultsTV />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/confirm-email" element={<ConfirmEmail />} />
+	  <Route path="/contacto" element={<Contacto />} />
           <Route path="/tv/:id/season/:seasonNumber" element={<SeasonDetail />} />
           <Route
             path="/tv/:id/season/:seasonNumber/episode/:episodeNumber"
