@@ -4,6 +4,8 @@ import com.arturviader.pelisbdapi.dto.CommentDto;
 import com.arturviader.pelisbdapi.model.MediaType;
 import com.arturviader.pelisbdapi.service.CommentService;
 import com.arturviader.pelisbdapi.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,7 @@ public class CommentController {
     private CommentService commentService;
 
     @PostMapping("/{type}/{itemId}/comments")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<CommentDto> addComment(
             @PathVariable String type,
             @PathVariable Long itemId,
@@ -47,6 +50,7 @@ public class CommentController {
     }
 
     @GetMapping("/{type}/{itemId}/comments")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<List<CommentDto>> getComments(
             @PathVariable String type,
             @PathVariable Long itemId,
@@ -58,6 +62,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/comments/{commentId}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId
     ) {
@@ -66,6 +71,7 @@ public class CommentController {
     }
 
     @PutMapping("/comments/{commentId}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<CommentDto> updateComment(
             @PathVariable Long commentId,
             @RequestBody Map<String, String> body

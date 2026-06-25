@@ -6,6 +6,8 @@ import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.service.UserEpisodeProgressService;
 import com.arturviader.pelisbdapi.service.UserMediaService;
 import com.arturviader.pelisbdapi.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,7 @@ public class UserMediaController {
     private UserEpisodeProgressService episodeProgressService;
 
     @PostMapping("/api/user/watched")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<Void> addToWatched(@RequestBody WatchedRequest request) {
         User user = getCurrentUser();
         mediaService.addToWatched(user, MediaType.valueOf(request.type()), request.itemId());
@@ -32,6 +35,7 @@ public class UserMediaController {
     }
 
     @DeleteMapping("/api/user/watched/{type}/{itemId}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<Void> removeFromWatched(@PathVariable String type, @PathVariable Long itemId) {
         User user = getCurrentUser();
         mediaService.removeFromWatched(user, MediaType.valueOf(type), itemId);
@@ -39,6 +43,7 @@ public class UserMediaController {
     }
 
     @GetMapping("/api/user/watched/status/{type}/{tmdbId}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<BooleanDto> isMovieWatched(
             @PathVariable MediaType type,
             @PathVariable Long tmdbId) {
@@ -52,6 +57,7 @@ public class UserMediaController {
     }
 
     @GetMapping("/api/user/watchlist")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<WatchListResponse> getWatchlist(@RequestParam(name = "page", defaultValue = "1") int page
             , @RequestParam(name = "size", defaultValue = "12") int size
             , @RequestParam(name = "sort", defaultValue = "dateadd") String sort) {
@@ -61,6 +67,7 @@ public class UserMediaController {
     }
 
     @GetMapping("/api/user/watched")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<WatchedResponse> getWatchedList(@RequestParam(name = "page", defaultValue = "1") int page
             , @RequestParam(name = "size", defaultValue = "12") int size
             , @RequestParam(name = "sort", defaultValue = "dateadd") String sort) {
@@ -70,6 +77,7 @@ public class UserMediaController {
     }
 
     @PostMapping("/api/user/watchlist")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<String> addToWatchlist(@RequestBody WatchListRequest request) {
         User user = getCurrentUser();
         mediaService.addToWatchlist(user, MediaType.valueOf(request.type()), request.itemId());
@@ -77,6 +85,7 @@ public class UserMediaController {
     }
 
     @DeleteMapping("/api/user/watchlist/{type}/{itemId}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<String> removeFromWatchlist(@PathVariable String type, @PathVariable Long itemId) {
         User user = getCurrentUser();
         mediaService.removeFromWatchlist(user, MediaType.valueOf(type), itemId);
@@ -84,6 +93,7 @@ public class UserMediaController {
     }
 
     @GetMapping("/api/user/watchlist/status/{type}/{tmbdId}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<BooleanDto> isMovieInWatchlist(@PathVariable MediaType type, @PathVariable Long tmbdId) {
         User user = getCurrentUser();
         boolean isInWatchList = mediaService.isMovieInWatchlist(user.getUserName(), tmbdId, type);
@@ -91,6 +101,7 @@ public class UserMediaController {
     }
 
     @PostMapping("/api/user/tv/{tvId}/episode")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public UserEpisodeProgressDto markEpisode(
             @PathVariable Long tvId,
             @RequestBody MarkEpisodeRequest request) {
@@ -99,6 +110,7 @@ public class UserMediaController {
     }
 
     @GetMapping("/api/user/tv/{tvId}/season/{seasonNumber}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public List<UserEpisodeProgressDto> getSeasonProgress(
             @PathVariable Long tvId,
             @PathVariable Integer seasonNumber) {

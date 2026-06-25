@@ -1,32 +1,31 @@
 // src/utils/api.js
 import axios from 'axios';
 
-// Crear instancia de axios
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080', // Usa variable de entorno
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
 });
 
-// Interceptor: Añadir API Key a todos los headers
-api.interceptors.request.use((config) => {
-  const apiKey = process.env.API_KEY;
-  if (apiKey) {
-    config.headers['X-API-Key'] = apiKey; // ✅ Añade la API Key
-  }
+api.interceptors.request.use(
+  (config) => {
+    const apiKey = import.meta.env.VITE_API_KEY;
+    if (apiKey) {
+      config.headers = config.headers ?? {};
+      config.headers['X-API-Key'] = apiKey;
+    }
 
-  // También puedes añadir token si lo necesitas
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers = config.headers ?? {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default api;
 
-// Auth
 export const authService = {
   register: (email, user, password) =>
     api.post('/auth/register', { email, password, userName: user }),
@@ -40,7 +39,6 @@ export const authService = {
     api.post(`/auth/confirmemail?token=${token}`),
 };
 
-// Movies
 export const moviesService = {
   getPopular: (page = 1) =>
     api.get(`/movies/popular?page=${page}`),
@@ -58,7 +56,6 @@ export const moviesService = {
     api.get(`/movies/category/${category}?page=${page}`),
 };
 
-// TV Shows
 export const tvService = {
   getPopular: (page = 1) =>
     api.get(`/tv/popular?page=${page}`),
@@ -79,18 +76,16 @@ export const tvService = {
 };
 
 export const searchService = {
-  search: (query, page = 1) => {
-    return api.get(`/search/multi`, {
+  search: (query, page = 1) =>
+    api.get('/search/multi', {
       params: {
         query,
         page,
         include_adult: false,
       },
-    });
-  },
+    }),
 };
 
-// User Lists
 export const userService = {
   addToWatched: (type, itemId) =>
     api.post('/user/watched', { type, itemId }),
@@ -118,7 +113,6 @@ export const userService = {
     api.post(`/user/tv/${tvId}/season`, { season, watched }),
 };
 
-// Ratings & Reviews
 export const reviewService = {
   rateItem: (type, itemId, rating) =>
     api.post(`/reviews/${type}/${itemId}/rate`, { rating }),

@@ -14,6 +14,7 @@ services:
       - ./build/postgree/testdatabase.sql:/docker-entrypoint-initdb.d/testdatabase.sql:ro
     networks:
       - app-network
+
   webpelis:
     build:
       context: .

@@ -5,6 +5,8 @@ import com.arturviader.pelisbdapi.exception.NoUserAuthenticated;
 import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.service.TMDBService;
 import com.arturviader.pelisbdapi.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +28,7 @@ public class TMDBController {
     private UserService userService;
 
     @GetMapping("/api/search/movie")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<MoviesResponseTMDB> searchMovies(@RequestParam String query,
                                                            @RequestParam(defaultValue = "1") int page) {
         User user = getCurrentUser();
@@ -33,6 +36,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/movies/{id}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<MovieDetailTMDB> getMovieById(@PathVariable Long id) {
         MovieDetailTMDB movie = tmdbService.getMovieDetailWithTrailer(id);
         if (movie == null) {
@@ -42,6 +46,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/movies/popular")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<MoviesResponseTMDB> getPopularMovies(
             @RequestParam(defaultValue = "1") int page) {
 
@@ -51,6 +56,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/movies/trending")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<MoviesResponseTMDB> getTrendingMovies(
             @RequestParam(defaultValue = "day") String timeWindow,
             @RequestParam(defaultValue = "1") int page) {
@@ -60,6 +66,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/tv/popular")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<SeriesResponseTMDB> getPopularTvShows(
             @RequestParam(defaultValue = "1") int page) {
         User user = getCurrentUser();
@@ -68,6 +75,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/tv/trending")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<SeriesResponseTMDB> getTrendingTvShows(
             @RequestParam(defaultValue = "day") String timeWindow,
             @RequestParam(defaultValue = "1") int page) {
@@ -77,6 +85,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/search/tv")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<SeriesResponseTMDB> searchTvShows(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int page) {
@@ -85,6 +94,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/search/multi")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<SearchResultsMoviesAndTV> searchAll(
             @RequestParam String query
     ) {
@@ -96,6 +106,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/tv/{id}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<SerieDetailTMDB> getTvShowDetail(@PathVariable Long id) {
         SerieDetailTMDB show = tmdbService.getTvShowDetailWithTrailer(id);
         if (show == null) {
@@ -105,6 +116,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/tv/{id}/season/{seasonNumber}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<SeasonSerieDetailTMDB> getSeasonDetail(
             @PathVariable Long id,
             @PathVariable Integer seasonNumber) {
@@ -116,6 +128,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/tv/{id}/season/{seasonNumber}/episode/{episodeNumber}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<EpisodeSerieDetailTMDB> getEpisodeDetail(
             @PathVariable Long id,
             @PathVariable Integer seasonNumber,
@@ -128,18 +141,21 @@ public class TMDBController {
     }
 
     @GetMapping("/api/movies/{id}/videos")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<List<VideoTMDB>> getMovieVideos(@PathVariable Long id) {
         List<VideoTMDB> videos = tmdbService.getMovieVideos(id);
         return ResponseEntity.ok(videos);
     }
 
     @GetMapping("/api/tv/{id}/videos")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<List<VideoTMDB>> getTvShowVideos(@PathVariable Long id) {
         List<VideoTMDB> videos = tmdbService.getTvShowVideos(id);
         return ResponseEntity.ok(videos);
     }
 
     @GetMapping("/api/movies/category/{id}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<GenreDetailMoviesTMDB> getGenreDetail(
             @PathVariable Long id,
             @RequestParam(defaultValue = "1") int page) {
@@ -153,6 +169,7 @@ public class TMDBController {
     }
 
     @GetMapping("/api/tv/category/{id}")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<GenreDetailSeriesTMDB> getGenreDetailSeries(
             @PathVariable Long id,
             @RequestParam(defaultValue = "1") int page,
@@ -166,11 +183,13 @@ public class TMDBController {
     }
 
     @GetMapping("/api/movies/categories")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<List<Genre>> getAllGenres() {
         return ResponseEntity.ok(tmdbService.getAllGenres());
     }
 
     @GetMapping("/api/tv/categories")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<List<Genre>> getAllTVGenres() {
         return ResponseEntity.ok(tmdbService.getAllTVGenres());
     }

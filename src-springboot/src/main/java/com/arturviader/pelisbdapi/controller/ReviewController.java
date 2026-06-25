@@ -4,6 +4,8 @@ import com.arturviader.pelisbdapi.model.Review;
 import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.service.ReviewService;
 import com.arturviader.pelisbdapi.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @PostMapping("/{type}/{id}/rate")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<Map<String, Object>> rateItem(
             @PathVariable String type,
             @PathVariable Long id,
@@ -37,6 +40,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{type}/{id}/ratings")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<Map<String, Object>> getItemRatings(
             @PathVariable String type,
             @PathVariable Long id) {

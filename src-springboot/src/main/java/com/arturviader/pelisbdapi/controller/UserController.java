@@ -4,6 +4,8 @@ import com.arturviader.pelisbdapi.dto.JwtResponse;
 import com.arturviader.pelisbdapi.dto.LoginRequest;
 import com.arturviader.pelisbdapi.dto.NewUserRequest;
 import com.arturviader.pelisbdapi.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,18 +19,21 @@ public class UserController {
     }
 
     @PostMapping("/api/auth/register")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<Void> register(@RequestBody NewUserRequest user) {
         userService.registerUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/api/auth/login")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest request) {
         JwtResponse jwtResponse = userService.loginUser(request);
         return ResponseEntity.ok(jwtResponse);
     }
 
     @PostMapping("/api/auth/confirmemail")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<String> confirmEmail(@RequestParam(name = "token", defaultValue = "") String token) {
         userService.confirmEmail(token);
         return ResponseEntity.ok("Email confirmado");
