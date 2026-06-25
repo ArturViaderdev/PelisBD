@@ -105,7 +105,7 @@ source ~/.bashrc
 
 ## Configuración del frontend
 
-En el frontend se usan archivos `.env.test` o `.env.production`, según el entorno.
+En el frontend se usan archivos `.env` o `.env.production`, según el entorno.
 
 ```bash
 cd src-frontend/frontend
