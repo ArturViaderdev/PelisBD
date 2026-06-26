@@ -263,3 +263,287 @@ http://localhost:3000/swagger-ui/index.html
 - La base de datos debe coincidir con las credenciales definidas en Docker Compose.
 - Para producción, se recomienda usar la rama `FirstProductionVersion` y el ZIP de Releases.
 
+# PelisBD
+
+**PelisBD** is a web application for tracking movies and TV series that you have watched, have pending, or have commented on. It allows you to mark movies and series as watched or pending, rate and comment on titles, and, in the case of series, keep track by season and episode.
+
+The application consists of:
+
+- A custom **backend** in Java + Spring Boot.
+- A **frontend** in Node.js, initially generated with the help of AI and later manually modified.
+
+
+## Features
+
+- Pending movies list.
+- Watched movies list.
+- Movie and TV series ratings.
+- Comments on movies and TV series.
+- Tracking of watched seasons and episodes in series.
+- TMDB integration for catalog and metadata.
+- JWT authentication system.
+- Email sending for account confirmation.
+
+
+## Technologies
+
+- Java 25
+- Spring Boot
+- Spring Security
+- PostgreSQL
+- Docker / Docker Compose
+- Node.js
+- Vite
+- Nginx
+- TMDB API
+
+
+## Repository
+
+```bash
+git clone https://github.com/ArturViaderdev/PelisBD.git
+cd PelisBD
+```
+
+
+***
+
+## Backend setup
+
+The backend uses a `.env.local` file with the required environment variables.
+
+```bash
+cd src-springboot
+cp env.txt .env.local
+nano .env.local
+```
+
+You must fill in these values:
+
+```env
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_HOST=
+MAIL_PORT=
+TMDB_API_KEY=
+APP_JWT_SECRET=
+SPRING_DATASOURCE_USERNAME=
+SPRING_DATASOURCE_PASSWORD=
+FRONTEND_URL=
+API_KEY=
+```
+
+
+### What each variable means
+
+- `MAIL_USERNAME` / `MAIL_PASSWORD` / `MAIL_HOST` / `MAIL_PORT`: email sending configuration.
+- `TMDB_API_KEY`: access key for the TMDB API.
+- `APP_JWT_SECRET`: secret used to sign and validate JWTs.
+- `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD`: database credentials defined in `docker-compose.yml`.
+- `FRONTEND_URL`: frontend URL used to generate correct links in confirmation emails.
+- `API_KEY`: additional key used to protect access to the web service.
+
+
+### Generate secure keys
+
+To generate `APP_JWT_SECRET` and `API_KEY`, run this command twice:
+
+```bash
+openssl rand -hex 32
+```
+
+
+### Run the backend
+
+You can run the backend from IntelliJ IDEA or build it with Maven:
+
+```bash
+mvn clean package
+```
+
+The build runs all tests. The resulting `.jar` file will be generated in the `target/` directory.
+
+### If Java errors occur
+
+Before building, it may be necessary to adjust the JDK environment variables:
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+source ~/.bashrc
+```
+
+
+***
+
+## Frontend setup
+
+The frontend uses `.env` or `.env.production` files, depending on the environment.
+
+```bash
+cd src-frontend/frontend
+cp env.txt .env.test
+# or
+cp env.txt .env.production
+nano .env.test
+# or
+nano .env.production
+```
+
+Required variables:
+
+```env
+VITE_API_BASE_URL=
+VITE_API_KEY=
+```
+
+
+### What each variable means
+
+- `VITE_API_BASE_URL`: base URL of the Java API.
+- `VITE_API_KEY`: the same API key generated previously.
+
+
+### Run the frontend
+
+Development / testing mode:
+
+```bash
+npm install
+npm run dev
+```
+
+Production build:
+
+```bash
+npm run build
+```
+
+The generated files will appear in `dist/`. After that, you can copy them to the folder served by Apache/Nginx in Docker.
+
+```bash
+cp -rf dist/* ../docker-deploy/html
+```
+
+
+***
+
+## Docker deployment
+
+For more complete deployments, you can use the ZIP published in **Releases**, along with a more advanced `docker compose` setup that includes a container for running the backend.
+
+There is also a branch called `FirstProductionVersion`, intended for production. That version does not include Swagger and is more hardened from a security standpoint.
+
+### Deployment steps
+
+1. Build the frontend.
+2. Copy the generated files to `docker-deploy/html`.
+3. Configure the backend environment variables.
+4. Adjust Nginx if deploying on a real server.
+5. Start the services with Docker Compose.
+
+### Production setup
+
+For a real HTTPS environment:
+
+- use `nginxproduction.conf`,
+- configure `server_name`,
+- generate `.pem` certificates with `certbot`,
+- open ports `80` and `443`.
+
+In production, Nginx handles redirection and exposes the application over HTTPS.
+
+### Start the deployment
+
+From the root of `docker-deploy`:
+
+```bash
+docker compose up -d
+```
+
+
+***
+
+## API endpoints
+
+Swagger documentation is available by default at:
+
+```text
+http://localhost:3000/swagger-ui/index.html
+```
+
+
+### Authentication
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/confirmemail`
+
+
+### Movies
+
+- `GET /api/movies/popular`
+- `GET /api/movies/trending`
+- `GET /api/movies/{id}`
+- `GET /api/movies/{id}/videos`
+- `GET /api/movies/categories`
+- `GET /api/movies/category/{id}`
+
+
+### TV series
+
+- `GET /api/tv/popular`
+- `GET /api/tv/trending`
+- `GET /api/tv/{id}`
+- `GET /api/tv/{id}/videos`
+- `GET /api/tv/{id}/season/{seasonNumber}`
+- `GET /api/tv/{id}/season/{seasonNumber}/episode/{episodeNumber}`
+- `GET /api/tv/categories`
+- `GET /api/tv/category/{id}`
+
+
+### Search
+
+- `GET /api/search/movie`
+- `GET /api/search/tv`
+- `GET /api/search/multi`
+
+
+### User state
+
+- `GET /api/user/watchlist`
+- `POST /api/user/watchlist`
+- `DELETE /api/user/watchlist/{type}/{itemId}`
+- `GET /api/user/watchlist/status/{type}/{tmdbId}`
+- `GET /api/user/watched`
+- `POST /api/user/watched`
+- `DELETE /api/user/watched/{type}/{itemId}`
+- `GET /api/user/watched/status/{type}/{tmdbId}`
+- `POST /api/user/tv/{tvId}/episode`
+- `GET /api/user/tv/{tvId}/season/{seasonNumber}`
+
+
+### Comments and ratings
+
+- `POST /api/reviews/{type}/{id}/rate`
+- `GET /api/reviews/{type}/{id}/ratings`
+- `GET /api/reviews/{type}/{itemId}/comments`
+- `POST /api/reviews/{type}/{itemId}/comments`
+- `PUT /api/reviews/comments/{commentId}`
+- `DELETE /api/reviews/comments/{commentId}`
+
+
+### Administration
+
+- `GET /api/admin/comments`
+- `DELETE /api/admin/comments/{commentId}`
+
+***
+
+## Installation notes
+
+- The TMDB API key must be valid.
+- The frontend must point to the correct backend URL.
+- The database must match the credentials defined in Docker Compose.
+- For production, it is recommended to use the `FirstProductionVersion` branch and the Releases ZIP.
+
