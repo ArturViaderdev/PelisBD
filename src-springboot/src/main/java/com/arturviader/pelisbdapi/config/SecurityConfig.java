@@ -2,8 +2,6 @@ package com.arturviader.pelisbdapi.config;
 
 import com.arturviader.pelisbdapi.security.JwtAuthenticationFilter;
 import com.arturviader.pelisbdapi.security.JwtUserDetailsService;
-import jakarta.servlet.DispatcherType;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

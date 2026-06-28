@@ -1,8 +1,6 @@
 package com.arturviader.pelisbdapi.dto;
 
 import com.arturviader.pelisbdapi.model.MediaType;
-import com.arturviader.pelisbdapi.model.User;
-import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 

@@ -2,7 +2,6 @@ package com.arturviader.pelisbdapi.service;
 
 import com.arturviader.pelisbdapi.dto.*;
 import com.arturviader.pelisbdapi.model.User;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
