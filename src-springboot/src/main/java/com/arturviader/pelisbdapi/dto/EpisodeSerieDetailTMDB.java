@@ -2,7 +2,6 @@ package com.arturviader.pelisbdapi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 public class EpisodeSerieDetailTMDB extends EpisodeSerieTMDB {
     @JsonProperty("still_path")
     private String stillPath;
