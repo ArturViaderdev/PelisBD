@@ -76,6 +76,15 @@ public class UserMediaController {
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping("/api/watched")
+    public ResponseEntity<WatchedResponse> getGlobalWatchedList(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "12") int size,
+            @RequestParam(name = "sort", defaultValue = "dateadd") String sort) {
+        WatchedResponse list = mediaService.getGlobalWatchedList(page, size, sort);
+        return ResponseEntity.ok(list);
+    }
+
     @PostMapping("/api/user/watchlist")
     @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<String> addToWatchlist(@RequestBody WatchListRequest request) {

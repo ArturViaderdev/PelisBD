@@ -109,6 +109,8 @@ export const userService = {
     api.get(`/user/watchlist/status/${type}/${tmdbId}`),
   markEpisode: (tvId, season, episode, watched = true) =>
     api.post(`/user/tv/${tvId}/episode`, { season, episode, watched }),
+  getGlobalWatchedList: (page = 1, size = 12, sort = 'dateadd') =>
+    api.get('/watched', { params: { page, size, sort } }),
   markSeason: (tvId, season, watched = true) =>
     api.post(`/user/tv/${tvId}/season`, { season, watched }),
 };

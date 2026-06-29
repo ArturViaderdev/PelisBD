@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -264,4 +265,56 @@ public class UserMediaServiceImpl implements UserMediaService {
                 .toList();
         return new WatchedResponse(itemsdto, page, size, totalElements, totalPages, last, first);
     }
+
+    @Override
+    public WatchedResponse getGlobalWatchedList(int page, int size, String sort) {
+        List<GlobalWatchedItem> watchedItems = watchedRepo.findGlobalWatchedDistinct();
+        sortGlobalProjectedItems(watchedItems, sort);
+        int totalElements = watchedItems.size();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        boolean first = page <= 1;
+        boolean last = page >= totalPages;
+        int initialResult = Math.max((page - 1) * size, 0);
+        int endResult = Math.min(initialResult + size, totalElements);
+        List<GlobalWatchedItem> results = initialResult < totalElements
+                ? watchedItems.subList(initialResult, endResult)
+                : Collections.emptyList();
+        List<WatchedItemDto> itemsdto = results.stream()
+                .map(userWatchedMapper::toGlobalDto)
+                .toList();
+        return new WatchedResponse(itemsdto, page, size, totalElements, totalPages, last, first);
+    }
+
+    private void sortGlobalProjectedItems(List<GlobalWatchedItem> items, String sort) {
+        items.sort((a, b) -> switch (sort) {
+            case "dateadd" -> {
+                LocalDateTime dateA = a.watchedAt() != null ? a.watchedAt() : LocalDateTime.MIN;
+                LocalDateTime dateB = b.watchedAt() != null ? b.watchedAt() : LocalDateTime.MIN;
+                yield dateB.compareTo(dateA); // más reciente primero
+            }
+            case "userating" -> {
+                Double avgRatingA = reviewService.getAverageRating(a.itemId(), a.type().toString());
+                Double avgRatingB = reviewService.getAverageRating(b.itemId(), b.type().toString());
+                if (avgRatingA == null) avgRatingA = 0.0;
+                if (avgRatingB == null) avgRatingB = 0.0;
+                yield avgRatingB.compareTo(avgRatingA);
+            }
+            case "numrating" -> {
+                Long countA = reviewService.getTotalRatings(a.itemId(), a.type().toString());
+                Long countB = reviewService.getTotalRatings(b.itemId(), b.type().toString());
+                if (countA == null) countA = 0L;
+                if (countB == null) countB = 0L;
+                yield countB.compareTo(countA);
+            }
+            case "title" -> {
+                String titleA = getTitleFromMedia(a.itemId(), a.type());
+                String titleB = getTitleFromMedia(b.itemId(), b.type());
+                if (titleA == null) titleA = "";
+                if (titleB == null) titleB = "";
+                yield titleA.compareToIgnoreCase(titleB);
+            }
+            default -> 0;
+        });
+    }
+
 }
