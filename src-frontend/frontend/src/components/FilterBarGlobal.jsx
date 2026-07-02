@@ -16,7 +16,6 @@ export default function FilterBar({
          <option value="dateadd">Fecha de inserción</option>
           <option value="userating">Calificación de los usuarios</option>
           <option value="numrating">Número de votos de los usuarios</option>
-          <option value="title">Título</option>
         </select>
       </div>
     </div>

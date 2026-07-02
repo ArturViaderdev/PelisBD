@@ -11,6 +11,9 @@ import com.arturviader.pelisbdapi.repository.UserWatchedItemRepository;
 import com.arturviader.pelisbdapi.repository.UserWatchlistItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -202,92 +205,165 @@ public class UserMediaServiceImpl implements UserMediaService {
 
     @Override
     public WatchListResponse getWatchlist(User user, int page, int size, String sort) {
-        String userId = user.getUserName();
-        List<UserWatchlistItem> watchListItems = watchlistRepository.findByUser(user);
-        sortWatchlistItems(watchListItems, sort, user);
-        int totalElements = watchListItems.size();
-        int totalPages = (int) Math.ceil((double) totalElements / size);
-        boolean first = false;
-        boolean last = false;
-        if (page <= 1) {
-            first = true;
-        }
-        if (page >= totalPages) {
-            last = true;
-        }
-        int initialResult = (page - 1) * size;
-        int endResult = initialResult + size;
-        if (endResult > totalElements) {
-            endResult = totalElements ;
-        }
-        List<UserWatchlistItem> results = new ArrayList<>();
-        for (int count = initialResult; count < endResult; count++) {
-            results.add(watchListItems.get(count));
-        }
-        List<WatchlistItemDto> itemsdto = results.stream()
+        Long watchlistUserId = user.getId();
+        String reviewUsername = user.getUserName();
+
+        int safePage = Math.max(page, 1);
+        int safeSize = Math.max(size, 1);
+        int pageIndex = safePage - 1;
+
+        Page<UserWatchlistItem> watchlistPage = switch (sort == null ? "dateadd" : sort.toLowerCase()) {
+            case "dateadd" -> watchlistRepository.findByUser(
+                    user,
+                    PageRequest.of(pageIndex, safeSize, Sort.by(Sort.Direction.DESC, "addedAt"))
+            );
+
+            case "ownrating" -> watchlistRepository.findByUserOrderByOwnRatingDesc(
+                    watchlistUserId,
+                    reviewUsername,
+                    PageRequest.of(pageIndex, safeSize)
+            );
+
+            case "userating" -> watchlistRepository.findByUserOrderByAverageRatingDesc(
+                    watchlistUserId,
+                    PageRequest.of(pageIndex, safeSize)
+            );
+
+            case "numrating" -> watchlistRepository.findByUserOrderByRatingsCountDesc(
+                    watchlistUserId,
+                    PageRequest.of(pageIndex, safeSize)
+            );
+
+            default -> watchlistRepository.findByUser(
+                    user,
+                    PageRequest.of(pageIndex, safeSize, Sort.by(Sort.Direction.ASC, "addedAt"))
+            );
+        };
+
+        List<WatchlistItemDto> itemsdto = watchlistPage.getContent().stream()
                 .map(item -> {
-                    boolean isWatched = isMovieWatched(item.getItemId(), userId, item.getType());
+                    boolean isWatched = isMovieWatched(item.getItemId(), reviewUsername, item.getType());
                     return userWatchListMapper.toDtoWithMovieData(item, isWatched);
                 })
                 .toList();
-        return new WatchListResponse(itemsdto, page, size, totalElements, totalPages, last, first);
+
+        return new WatchListResponse(
+                itemsdto,
+                safePage,
+                safeSize,
+                (int) watchlistPage.getTotalElements(),
+                watchlistPage.getTotalPages(),
+                watchlistPage.isLast(),
+                watchlistPage.isFirst()
+        );
     }
 
     @Override
     public WatchedResponse getWatchedList(User user, int page, int size, String sort) {
-        String userId = user.getUserName();
-        List<UserWatchedItem> watchedItems = watchedRepo.findByUser(user);
-        sortWatchedItems(watchedItems, sort, user);
-        int totalElements = watchedItems.size();
-        int totalPages = (int) Math.ceil((double) totalElements / size);
-        boolean first = false;
-        boolean last = false;
-        if (page <= 1) {
-            first = true;
-        }
-        if (page >= totalPages) {
-            last = true;
-        }
-        int initialResult = (page - 1) * size;
-        int endResult = initialResult + size;
-        if (endResult > totalElements) {
-            endResult = totalElements;
-        }
-        List<UserWatchedItem> results = new ArrayList<>();
-        for (int count = initialResult; count < endResult; count++) {
-            results.add(watchedItems.get(count));
-        }
-        List<WatchedItemDto> itemsdto = results.stream()
+        Long watchedUserId = user.getId();
+        String reviewUsername = user.getUserName();
+
+        int safePage = Math.max(page, 1);
+        int safeSize = Math.max(size, 1);
+        int pageIndex = safePage - 1;
+
+        Page<UserWatchedItem> watchedPage = switch (sort == null ? "dateadd" : sort.toLowerCase()) {
+            case "dateadd" -> watchedRepo.findByUser(
+                    user,
+                    PageRequest.of(pageIndex, safeSize, Sort.by(Sort.Direction.DESC, "watchedAt"))
+            );
+
+            case "ownrating" -> watchedRepo.findByUserOrderByOwnRatingDesc(
+                    watchedUserId,
+                    reviewUsername,
+                    PageRequest.of(pageIndex, safeSize)
+            );
+
+            case "userating" -> watchedRepo.findByUserOrderByAverageRatingDesc(
+                    watchedUserId,
+                    PageRequest.of(pageIndex, safeSize)
+            );
+
+            case "numrating" -> watchedRepo.findByUserOrderByRatingsCountDesc(
+                    watchedUserId,
+                    PageRequest.of(pageIndex, safeSize)
+            );
+
+            default -> watchedRepo.findByUser(
+                    user,
+                    PageRequest.of(pageIndex, safeSize, Sort.by(Sort.Direction.ASC, "watchedAt"))
+            );
+        };
+
+        List<WatchedItemDto> itemsdto = watchedPage.getContent().stream()
                 .map(item -> {
-                    boolean isWatchListed = isMovieInWatchlist(userId, item.getItemId(), item.getType());
+                    boolean isWatchListed = isMovieInWatchlist(user.getUserName(), item.getItemId(), item.getType());
                     return userWatchedMapper.toDtoWithMovieData(item, isWatchListed);
                 })
                 .toList();
-        return new WatchedResponse(itemsdto, page, size, totalElements, totalPages, last, first);
+
+        return new WatchedResponse(
+                itemsdto,
+                safePage,
+                safeSize,
+                (int) watchedPage.getTotalElements(),
+                watchedPage.getTotalPages(),
+                watchedPage.isLast(),
+                watchedPage.isFirst()
+        );
     }
 
     @Override
     public WatchedResponse getGlobalWatchedList(int page, int size, String sort, User user) {
-        String userId = user.getUserName();
-        List<GlobalWatchedItem> watchedItems = watchedRepo.findGlobalWatchedDistinct();
-        sortGlobalProjectedItems(watchedItems, sort);
-        int totalElements = watchedItems.size();
-        int totalPages = (int) Math.ceil((double) totalElements / size);
-        boolean first = page <= 1;
-        boolean last = page >= totalPages;
-        int initialResult = Math.max((page - 1) * size, 0);
-        int endResult = Math.min(initialResult + size, totalElements);
-        List<GlobalWatchedItem> results = initialResult < totalElements
-                ? watchedItems.subList(initialResult, endResult)
-                : Collections.emptyList();
-        List<WatchedItemDto> itemsdto = results.stream()
-                .map(item->{
-                            boolean isWatchListed = isMovieInWatchlist(userId, item.itemId(), item.type());
-                            boolean isWatched = isMovieWatched(item.itemId(),userId,item.type());
-                            return userWatchedMapper.toGlobalDto(item,isWatchListed,isWatched);
+        String reviewUsername = user.getUserName();
+
+        int safePage = Math.max(page, 1);
+        int safeSize = Math.max(size, 1);
+        int pageIndex = safePage - 1;
+
+        Page<GlobalWatchedProjection> watchedPage = switch (sort == null ? "dateadd" : sort.toLowerCase()) {
+            case "dateadd" -> watchedRepo.findGlobalWatchedDistinctOrderByDateDesc(
+                    PageRequest.of(pageIndex, safeSize)
+            );
+
+            case "userating" -> watchedRepo.findGlobalWatchedDistinctOrderByAverageRatingDesc(
+                    PageRequest.of(pageIndex, safeSize)
+            );
+
+            case "numrating" -> watchedRepo.findGlobalWatchedDistinctOrderByRatingsCountDesc(
+                    PageRequest.of(pageIndex, safeSize)
+            );
+
+            default -> watchedRepo.findGlobalWatchedDistinctOrderByTitleAsc(
+                    PageRequest.of(pageIndex, safeSize)
+            );
+        };
+
+        List<WatchedItemDto> itemsdto = watchedPage.getContent().stream()
+                .map(item -> {
+                    MediaType mediaType = MediaType.valueOf(item.getType().toLowerCase());
+                    boolean isWatchListed = isMovieInWatchlist(reviewUsername, item.getItemId(), mediaType);
+                    boolean isWatched = isMovieWatched(item.getItemId(), reviewUsername, mediaType);
+
+                    GlobalWatchedItem globalItem = new GlobalWatchedItem(
+                            item.getItemId(),
+                            mediaType,
+                            item.getWatchedAt()
+                    );
+
+                    return userWatchedMapper.toGlobalDto(globalItem, isWatchListed, isWatched);
                 })
                 .toList();
-        return new WatchedResponse(itemsdto, page, size, totalElements, totalPages, last, first);
+
+        return new WatchedResponse(
+                itemsdto,
+                safePage,
+                safeSize,
+                (int) watchedPage.getTotalElements(),
+                watchedPage.getTotalPages(),
+                watchedPage.isLast(),
+                watchedPage.isFirst()
+        );
     }
 
     private void sortGlobalProjectedItems(List<GlobalWatchedItem> items, String sort) {

@@ -71,13 +71,13 @@ public class SecurityConfig {
                                 "/api/search/multi",
                                 "/api/search/movie",
                                 "/api/search/tv",
+                                "/api/watched",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/docs/api-docs/**"
                         ).permitAll()
                         .requestMatchers(
-                                "/api/user/watched",
                                 "/api/user/watched/{type}/{itemId}",
                                 "/api/user/watched/status/{type}/{tmbdId}",
                                 "/api/user/watchlist",
@@ -109,7 +109,8 @@ public class SecurityConfig {
 
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:*",
-                "http://127.0.0.1:*"
+                "http://127.0.0.1:*",
+                frontendUrl
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
