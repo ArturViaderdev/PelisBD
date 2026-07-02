@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -80,8 +82,17 @@ public class UserMediaController {
     public ResponseEntity<WatchedResponse> getGlobalWatchedList(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "12") int size,
-            @RequestParam(name = "sort", defaultValue = "dateadd") String sort) {
-        User user = getCurrentUser();
+            @RequestParam(name = "sort", defaultValue = "dateadd") String sort,
+            Authentication authentication) {
+
+        User user = null;
+
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+            user = getCurrentUser();
+        }
+
         WatchedResponse list = mediaService.getGlobalWatchedList(page, size, sort, user);
         return ResponseEntity.ok(list);
     }

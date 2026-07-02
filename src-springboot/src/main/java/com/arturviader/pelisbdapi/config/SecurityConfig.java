@@ -72,6 +72,7 @@ public class SecurityConfig {
                                 "/api/search/movie",
                                 "/api/search/tv",
                                 "/api/watched",
+                                "/api/watched/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
