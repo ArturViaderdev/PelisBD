@@ -67,7 +67,7 @@ public class UserWatchedMapper {
 
     }
 
-    public WatchedItemDto toGlobalDto(GlobalWatchedItem item) {
+    public WatchedItemDto toGlobalDto(GlobalWatchedItem item, boolean isInWatchList, boolean isWatched) {
         return switch (item.type()) {
             case movie -> {
                 Movie movie = movieRepository.findByTmdbId(item.itemId())
@@ -85,8 +85,8 @@ public class UserWatchedMapper {
                                 ? movie.getReleaseDate().toString()
                                 : null,                                      // release_date
                         "movie",                                             // media_type
-                        false,                                               // watchListed
-                        true                                                 // watched
+                        isInWatchList,                                               // watchListed
+                        isWatched                                                 // watched
                 );
             }
             case tv -> {
@@ -105,8 +105,8 @@ public class UserWatchedMapper {
                                 ? serie.getReleaseDate().toString()
                                 : null,                                      // release_date
                         "tv",                                                // media_type
-                        false,                                               // watchListed
-                        true                                                 // watched
+                        isInWatchList,                                               // watchListed
+                        isWatched                                                 // watched
                 );
             }
         };

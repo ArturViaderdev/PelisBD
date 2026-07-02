@@ -267,7 +267,8 @@ public class UserMediaServiceImpl implements UserMediaService {
     }
 
     @Override
-    public WatchedResponse getGlobalWatchedList(int page, int size, String sort) {
+    public WatchedResponse getGlobalWatchedList(int page, int size, String sort, User user) {
+        String userId = user.getUserName();
         List<GlobalWatchedItem> watchedItems = watchedRepo.findGlobalWatchedDistinct();
         sortGlobalProjectedItems(watchedItems, sort);
         int totalElements = watchedItems.size();
@@ -280,7 +281,11 @@ public class UserMediaServiceImpl implements UserMediaService {
                 ? watchedItems.subList(initialResult, endResult)
                 : Collections.emptyList();
         List<WatchedItemDto> itemsdto = results.stream()
-                .map(userWatchedMapper::toGlobalDto)
+                .map(item->{
+                            boolean isWatchListed = isMovieInWatchlist(userId, item.itemId(), item.type());
+                            boolean isWatched = isMovieWatched(item.itemId(),userId,item.type());
+                            return userWatchedMapper.toGlobalDto(item,isWatchListed,isWatched);
+                })
                 .toList();
         return new WatchedResponse(itemsdto, page, size, totalElements, totalPages, last, first);
     }

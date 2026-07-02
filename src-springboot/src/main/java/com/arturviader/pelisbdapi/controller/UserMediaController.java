@@ -81,7 +81,8 @@ public class UserMediaController {
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "12") int size,
             @RequestParam(name = "sort", defaultValue = "dateadd") String sort) {
-        WatchedResponse list = mediaService.getGlobalWatchedList(page, size, sort);
+        User user = getCurrentUser();
+        WatchedResponse list = mediaService.getGlobalWatchedList(page, size, sort, user);
         return ResponseEntity.ok(list);
     }
 
