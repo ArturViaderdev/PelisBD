@@ -315,8 +315,6 @@ public class UserMediaServiceImpl implements UserMediaService {
 
     @Override
     public WatchedResponse getGlobalWatchedList(int page, int size, String sort, User user) {
-        String reviewUsername = user != null ? user.getUserName() : null;
-
         int safePage = Math.max(page, 1);
         int safeSize = Math.max(size, 1);
         int pageIndex = safePage - 1;
@@ -341,14 +339,14 @@ public class UserMediaServiceImpl implements UserMediaService {
 
         List<WatchedItemDto> itemsdto = watchedPage.getContent().stream()
                 .map(item -> {
-                    MediaType mediaType = MediaType.valueOf(item.getType().toLowerCase());
+                    MediaType mediaType = MediaType.valueOf(item.getType().trim());
 
                     boolean isWatchListed = false;
                     boolean isWatched = false;
 
-                    if (reviewUsername != null) {
-                        isWatchListed = isMovieInWatchlist(reviewUsername, item.getItemId(), mediaType);
-                        isWatched = isMovieWatched(item.getItemId(), reviewUsername, mediaType);
+                    if (user != null) {
+                        isWatchListed = isMovieInWatchlist(user.getUserName(), item.getItemId(), mediaType);
+                        isWatched = isMovieWatched(item.getItemId(), user.getUserName(), mediaType);
                     }
 
                     GlobalWatchedItem globalItem = new GlobalWatchedItem(

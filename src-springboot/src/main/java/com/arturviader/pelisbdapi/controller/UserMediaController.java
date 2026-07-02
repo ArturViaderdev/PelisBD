@@ -1,6 +1,7 @@
 package com.arturviader.pelisbdapi.controller;
 
 import com.arturviader.pelisbdapi.dto.*;
+import com.arturviader.pelisbdapi.exception.NoUserAuthenticated;
 import com.arturviader.pelisbdapi.model.MediaType;
 import com.arturviader.pelisbdapi.model.User;
 import com.arturviader.pelisbdapi.service.UserEpisodeProgressService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,7 +57,12 @@ public class UserMediaController {
     }
 
     public User getCurrentUser() {
-        return userService.getCurrentUser();
+        try {
+            User user = userService.getCurrentUser();
+            return user;
+        } catch (NoUserAuthenticated | UsernameNotFoundException ex) {
+            return null;
+        }
     }
 
     @GetMapping("/api/user/watchlist")
@@ -82,17 +89,9 @@ public class UserMediaController {
     public ResponseEntity<WatchedResponse> getGlobalWatchedList(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "12") int size,
-            @RequestParam(name = "sort", defaultValue = "dateadd") String sort,
-            Authentication authentication) {
-
-        User user = null;
-
-        if (authentication != null
-                && authentication.isAuthenticated()
-                && !(authentication instanceof AnonymousAuthenticationToken)) {
-            user = getCurrentUser();
-        }
-
+            @RequestParam(name = "sort", defaultValue = "dateadd") String sort)
+    {
+        User user = getCurrentUser();
         WatchedResponse list = mediaService.getGlobalWatchedList(page, size, sort, user);
         return ResponseEntity.ok(list);
     }
