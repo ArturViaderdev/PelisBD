@@ -4,14 +4,15 @@ import { useAuthStore } from '../stores/authStore';
 import MovieCard from '../components/MovieCard';
 import FilterBar from '../components/FilterBar';
 import { useNavigate } from 'react-router-dom';
+import { useListParams } from '../utils/useListParams';
 
 export default function Watchlist() {
   const { isAuthenticated } = useAuthStore();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(0);
+  // Página y orden en la URL (?page=2&sort=...) para no perderlos al volver del detalle
+  const { page, setPage, sort, setSort } = useListParams({ defaultSort: 'dateadd' });
   const [size] = useState(12); // Tamaño fijo por página
-  const [sort, setSort] = useState('dateadd');
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function Watchlist() {
   const fetchWatchlist = async () => {
   try {
     setIsLoading(true);
-    const response = await userService.getWatchlist(page + 1, size, sort); // ✅ page + 1
+    const response = await userService.getWatchlist(page, size, sort);
     const data = response.data;
 
     setItems(data.content || []);
@@ -44,14 +45,13 @@ export default function Watchlist() {
   }, [isAuthenticated, page, size, sort, navigate]);
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 0 && newPage < totalPages) {
+    if (newPage >= 1 && newPage <= totalPages) {
       setPage(newPage);
     }
   };
 
   const handleSortChange = (newSort) => {
-    setSort(newSort);
-    setPage(0); // Resetear a la primera página
+    setSort(newSort); // vuelve a la página 1
   };
 
   return (
@@ -89,19 +89,19 @@ export default function Watchlist() {
           <div className="flex justify-center items-center gap-2 mt-8">
             <button
               onClick={() => handlePageChange(page - 1)}
-              disabled={page === 0}
+              disabled={page === 1}
               className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50"
             >
               Anterior
             </button>
 
             <span className="text-gray-400">
-              Página {page + 1} de {totalPages}
+              Página {page} de {totalPages}
             </span>
 
             <button
               onClick={() => handlePageChange(page + 1)}
-              disabled={page >= totalPages - 1}
+              disabled={page >= totalPages}
               className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50"
             >
               Siguiente

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -29,14 +31,27 @@ public class TvService {
                     tv.setTmdbId(tmdbSerie.getId());
                     tv.setTitle(tmdbSerie.getName());
                     tv.setPosterPath(tmdbSerie.getPosterPath());
-                    tv.setReleaseDate(LocalDate.parse(tmdbSerie.getFirstAirDate()));
+                    tv.setReleaseDate(parseDate(tmdbSerie.getFirstAirDate()));
                     return tvRepository.save(tv);
                 });
     }
 
     private boolean needsUpdate(Serie serie, SerieTMDB tmdbSerie) {
-        return !serie.getTitle().equals(tmdbSerie.getName())
-                || !serie.getPosterPath().equals(tmdbSerie.getPosterPath());
+        // Objects.equals evita NullPointerException si la serie no tiene póster
+        return !Objects.equals(serie.getTitle(), tmdbSerie.getName())
+                || !Objects.equals(serie.getPosterPath(), tmdbSerie.getPosterPath());
+    }
+
+    /** TMDB puede devolver la fecha vacía o nula en series sin estrenar. */
+    private LocalDate parseDate(String date) {
+        if (date == null || date.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(date);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 
     private void updateSerie(Serie serie, SerieTMDB tmdbSerie) {

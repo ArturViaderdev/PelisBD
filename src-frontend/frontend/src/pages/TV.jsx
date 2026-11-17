@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { tvService } from '../services/api';
 import MovieCard from '../components/MovieCard';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { useListParams } from '../utils/useListParams';
 
 export default function TV() {
   const [shows, setShows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+  // Página en la URL (?page=2) para no perderla al volver del detalle
+  const { page: currentPage, setPage: setCurrentPage } = useListParams();
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {

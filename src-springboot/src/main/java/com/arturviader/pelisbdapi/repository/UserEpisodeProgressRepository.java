@@ -18,5 +18,8 @@ public interface UserEpisodeProgressRepository extends JpaRepository<UserEpisode
     List<UserEpisodeProgress> findByUserIdAndTvIdAndSeasonNumber(
             Long userId, Long tvId, Integer seasonNumber);
 
+    /** Todos los capítulos marcados como vistos por el usuario (para la sección "Series en curso"). */
+    List<UserEpisodeProgress> findByUserIdAndWatchedTrue(Long userId);
+
 
 }

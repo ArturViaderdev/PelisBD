@@ -4,14 +4,15 @@ import { useAuthStore } from '../stores/authStore';
 import MovieCard from '../components/MovieCard';
 import FilterBar from '../components/FilterBar';
 import { useNavigate } from 'react-router-dom';
+import { useListParams } from '../utils/useListParams';
 
 export default function Watched() {
   const { isAuthenticated } = useAuthStore();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(1); // ✅ page=1 es la primera
+  // Página y orden en la URL (?page=2&sort=...) para no perderlos al volver del detalle
+  const { page, setPage, sort, setSort } = useListParams({ defaultSort: 'dateadd' });
   const [size] = useState(12);
-  const [sort, setSort] = useState('dateadd');
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
   const navigate = useNavigate();
@@ -49,8 +50,7 @@ export default function Watched() {
   };
 
   const handleSortChange = (newSort) => {
-    setSort(newSort);
-    setPage(1); // Resetear a la primera página
+    setSort(newSort); // vuelve a la página 1
   };
 
   return (

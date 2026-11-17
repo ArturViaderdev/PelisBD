@@ -73,12 +73,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
+        // Nota: /api/watched NO se excluye. Es una ruta pública (permitAll), pero si llega
+        // un token válido necesitamos autenticar al usuario para devolver sus flags
+        // watched/watchListed. Sin token (o con token inválido) se sigue como anónimo.
         return path.startsWith("/api/auth/")
                 || path.equals("/error")
                 || path.equals("/swagger-ui.html")
                 || path.startsWith("/swagger-ui/")
                 || path.equals("/v3/api-docs")
-                || path.startsWith("/v3/api-docs/")
-                || path.startsWith("/api/watched");
+                || path.startsWith("/v3/api-docs/");
     }
 }

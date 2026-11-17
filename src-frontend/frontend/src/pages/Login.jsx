@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { authService } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 
@@ -11,6 +11,15 @@ export default function Login() {
 
   const { setUser } = useAuthStore();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sessionExpired = searchParams.get('expired') === '1';
+
+  // Página a la que volver tras iniciar sesión (solo rutas internas).
+  const redirectParam = searchParams.get('redirect') || '/';
+  const redirectTo =
+    redirectParam.startsWith('/') && !redirectParam.startsWith('//')
+      ? redirectParam
+      : '/';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +38,7 @@ export default function Login() {
       };
 
       setUser(user, data.token);
-      navigate('/');
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -44,6 +53,12 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center px-4">
     <div className="card w-full max-w-md text-black">
     <h2 className="text-3xl font-bold text-center mb-8">Iniciar Sesión</h2>
+
+    {sessionExpired && !error && (
+      <div className="mb-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-800">
+      Tu sesión ha caducado. Vuelve a iniciar sesión.
+      </div>
+    )}
 
     {error && (
       <div className="mb-4 p-4 bg-red-100 border border-red-300 rounded-lg text-red-800">

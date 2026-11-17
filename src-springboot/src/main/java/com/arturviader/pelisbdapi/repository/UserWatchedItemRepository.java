@@ -31,6 +31,21 @@ public interface UserWatchedItemRepository extends JpaRepository<UserWatchedItem
 
     boolean existsByUserAndItemIdAndType(User user, Long itemId, MediaType mediaType);
 
+    /**
+     * Devuelve los items vistos por el usuario cuyo itemId esté en la lista dada.
+     * Se usa para resolver en UNA sola consulta qué elementos de una página
+     * ya ha visto el usuario.
+     */
+    @Query("""
+        SELECT w FROM UserWatchedItem w
+        WHERE w.user.id = :userId
+          AND w.itemId IN :itemIds
+    """)
+    List<UserWatchedItem> findByUserIdAndItemIdIn(
+            @Param("userId") Long userId,
+            @Param("itemIds") java.util.Collection<Long> itemIds
+    );
+
     @Query("""
         SELECT new com.arturviader.pelisbdapi.dto.GlobalWatchedItem(
             w.itemId,

@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import com.arturviader.pelisbdapi.exception.NoUserAuthenticated;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
@@ -27,6 +29,14 @@ public class TMDBServiceImpl implements TMDBService {
     private UserService userService;
     @Autowired
     private UserEpisodeProgressService userEpisodeProgressService;
+
+    private User getCurrentUserOrNull() {
+        try {
+            return userService.getCurrentUser();
+        } catch (NoUserAuthenticated | UsernameNotFoundException e) {
+            return null;
+        }
+    }
 
     @Override
     public MovieDetailTMDB getMovieDetailWithTrailer(Long movieId) {
@@ -229,7 +239,7 @@ public class TMDBServiceImpl implements TMDBService {
             SeasonSerieDetailTMDB detail = response.getBody();
             detail.setTvName(tvName);
             List<EpisodeSerieTMDB> episodes = detail.getEpisodes();
-            User user = userService.getCurrentUser();
+            User user = getCurrentUserOrNull();
             if (user != null) {
                 for (EpisodeSerieTMDB episode : episodes) {
                     episode.setWatched(userEpisodeProgressService.getEpisodeWatched(user.getId(), tvId, seasonNumber, episode.getEpisodeNumber()));
@@ -262,7 +272,7 @@ public class TMDBServiceImpl implements TMDBService {
             ResponseEntity<EpisodeSerieDetailTMDB> response = restTemplate.getForEntity(url, EpisodeSerieDetailTMDB.class);
             EpisodeSerieDetailTMDB detail = response.getBody();
             detail.setTvName(tvName);
-            User user = userService.getCurrentUser();
+            User user = getCurrentUserOrNull();
             if (user != null) {
                 detail.setWatched(userEpisodeProgressService.getEpisodeWatched(user.getId(), tvId, seasonNumber, episodeNumber));
             }

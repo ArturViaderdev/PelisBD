@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { expireSession, isTokenExpired } from '../utils/session';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
@@ -14,6 +15,12 @@ api.interceptors.request.use(
 
     const token = localStorage.getItem('token');
     if (token) {
+      // Token caducado: no se envía la petición, se cierra sesión y se va al login.
+      if (isTokenExpired(token)) {
+        expireSession();
+        return Promise.reject(new axios.CanceledError('Sesión caducada'));
+      }
+
       config.headers = config.headers ?? {};
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -21,6 +28,23 @@ api.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Solo si la petición iba con token (usuario logueado) y el backend lo rechaza.
+    // Las peticiones de usuarios no logueados no llevan token y no se ven afectadas.
+    const sentToken = Boolean(error.config?.headers?.Authorization);
+    const status = error.response?.status;
+    const isLoginRequest = error.config?.url?.startsWith('/auth/');
+
+    if (sentToken && !isLoginRequest && status === 401) {
+      expireSession();
+    }
+
+    return Promise.reject(error);
+  }
 );
 
 export default api;
@@ -112,6 +136,25 @@ export const userService = {
     api.get('/watched', { params: { page, size, sort } }),
   markSeason: (tvId, season, watched = true) =>
     api.post(`/user/tv/${tvId}/season`, { season, watched }),
+  getSeriesInProgress: () =>
+    api.get('/user/series-in-progress'),
+};
+
+// Películas 3D: propuestas de usuarios aprobadas por el administrador
+export const movies3dService = {
+  // Público
+  getApproved: (page = 1, size = 12) =>
+    api.get('/movies3d', { params: { page, size } }),
+  getApprovedIds: () => api.get('/movies3d/ids'),
+  getStatus: (tmdbId) => api.get(`/movies3d/${tmdbId}/status`),
+  // Usuario
+  request: (tmdbId) => api.post(`/user/movies3d/${tmdbId}/request`),
+  cancelRequest: (tmdbId) => api.delete(`/user/movies3d/${tmdbId}/request`),
+  // Administrador
+  getPendingRequests: () => api.get('/admin/movies3d/requests'),
+  approve: (tmdbId) => api.post(`/admin/movies3d/${tmdbId}/approve`),
+  reject: (tmdbId) => api.post(`/admin/movies3d/${tmdbId}/reject`),
+  remove: (tmdbId) => api.delete(`/admin/movies3d/${tmdbId}`),
 };
 
 export const reviewService = {

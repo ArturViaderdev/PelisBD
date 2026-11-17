@@ -7,6 +7,8 @@ import CommentSection from '../components/CommentSection';
 import EpisodeTracker from '../components/EpisodeTracker';
 import { FiBookmark, FiCheck } from 'react-icons/fi';
 import VideoList from '../components/VideoList';
+import BackButton from '../components/BackButton';
+import { useDocumentTitle } from '../utils/useDocumentTitle';
 
 export default function TVDetail() {
   const { id } = useParams();
@@ -20,6 +22,13 @@ export default function TVDetail() {
   const [totalRatings, setTotalRatings] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(null);
+
+  // Título de la pestaña: "Serie (año) | PelisBD"
+  useDocumentTitle(
+    tvShow?.name
+      ? `${tvShow.name}${tvShow.first_air_date ? ` (${new Date(tvShow.first_air_date).getFullYear()})` : ''}`
+      : null
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -181,6 +190,8 @@ export default function TVDetail() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <BackButton />
+
       {backdropUrl && (
         <div className="relative rounded-lg overflow-hidden h-96">
           <img
@@ -197,12 +208,19 @@ export default function TVDetail() {
           <img
             src={`https://image.tmdb.org/t/p/w342${tvShow.poster_path}`}
             alt={tvShow.name}
-            className="w-full rounded-lg shadow-lg"
+            className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg"
           />
         </div>
 
         <div className="md:col-span-3 space-y-4">
-          <h1 className="text-4xl font-bold">{tvShow.name}</h1>
+          <h1 className="text-4xl font-bold">
+            {tvShow.name}
+            {tvShow.first_air_date && (
+              <span className="ml-3 font-normal text-gray-400">
+                ({new Date(tvShow.first_air_date).getFullYear()})
+              </span>
+            )}
+          </h1>
 
           <div className="flex gap-4 flex-wrap">
             <button

@@ -97,6 +97,13 @@ export default function Header() {
               Visto por la comunidad
             </Link>
 
+            <Link
+              to="/movies-3d"
+              className="hover:text-primary transition-colors"
+            >
+              3D
+            </Link>
+
             {user ? (
               <>
                 <Link
@@ -113,12 +120,28 @@ export default function Header() {
                   Visto
                 </Link>
 
+                <Link
+                  to="/series-in-progress"
+                  className="hover:text-primary transition-colors"
+                >
+                  Series en curso
+                </Link>
+
                 {user.role === 'ADMIN' && (
                   <Link
                     to="/admin/comments"
                     className="hover:text-primary transition-colors"
                   >
                     Admin comentarios
+                  </Link>
+                )}
+
+                {user.role === 'ADMIN' && (
+                  <Link
+                    to="/admin/movies3d"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Admin 3D
                   </Link>
                 )}
 

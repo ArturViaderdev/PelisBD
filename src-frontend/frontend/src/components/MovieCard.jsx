@@ -3,6 +3,8 @@ import { FiBookmark, FiCheck, FiStar } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { userService } from '../services/api';
+import { useMovies3dStore } from '../stores/movies3dStore';
+import Badge3D from './Badge3D';
 
 export default function MovieCard({
   item,
@@ -11,6 +13,9 @@ export default function MovieCard({
   onWatchedToggle,
 }) {
   const user = useAuthStore((state) => state.user);
+  const is3d = useMovies3dStore(
+    (state) => type === 'movie' && state.ids.has(Number(item.id))
+  );
 
   const [isWatchlisted, setIsWatchlisted] = useState(Boolean(item.watchListed));
   const [isWatched, setIsWatched] = useState(Boolean(item.watched));
@@ -78,13 +83,15 @@ export default function MovieCard({
   return (
     <div className="group overflow-hidden rounded-lg card bg-gray-900 transition hover:scale-105">
       <Link to={`/${type}/${item.id}`} className="block">
-        <div className="relative h-96 overflow-hidden bg-gray-800">
+        <div className="relative aspect-[2/3] overflow-hidden bg-gray-800">
           <img
             src={posterUrl}
             alt={title}
             className="h-full w-full object-cover transition group-hover:scale-110"
             loading="lazy"
           />
+
+          {is3d && <Badge3D className="absolute top-2 right-2 z-10" />}
 
           <div className="absolute inset-0 flex items-end bg-black bg-opacity-0 transition-all duration-300 group-hover:bg-opacity-60">
             <div className="w-full translate-y-full p-4 transition-transform duration-300 group-hover:translate-y-0">

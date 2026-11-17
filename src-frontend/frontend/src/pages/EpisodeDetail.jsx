@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/authStore';
 import { FiCheck, FiArrowLeft } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useDocumentTitle } from '../utils/useDocumentTitle';
 
 export default function EpisodeDetail() {
   const { id, seasonNumber, episodeNumber } = useParams();
@@ -14,6 +15,12 @@ export default function EpisodeDetail() {
   const [episode, setEpisode] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Título de la pestaña: "Serie · T1E3 · Nombre del capítulo | PelisBD"
+  const episodeCode = `T${seasonNumber}E${episodeNumber}`;
+  useDocumentTitle(
+    [episode?.tv_name, episodeCode, episode?.name].filter(Boolean).join(' · ')
+  );
 
   // ✅ Detectamos si los parámetros han cambiado
   useEffect(() => {
@@ -119,7 +126,7 @@ export default function EpisodeDetail() {
         <img
           src={stillUrl}
           alt={episodeName}
-          className="w-40 h-56 object-cover rounded-lg shadow-lg"
+          className="w-full md:w-80 aspect-video object-cover rounded-lg shadow-lg"
         />
 
         <div className="flex-1">

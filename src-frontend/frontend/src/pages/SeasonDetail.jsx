@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/authStore';
 import { FiCheck } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useDocumentTitle } from '../utils/useDocumentTitle';
 
 export default function SeasonDetail() {
   const { id, seasonNumber } = useParams();
@@ -14,6 +15,13 @@ export default function SeasonDetail() {
   const [tvShow, setTvShow] = useState(null); // ✅ Datos de la serie
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Título de la pestaña: "Serie · Temporada N | PelisBD"
+  useDocumentTitle(
+    tvShow?.name
+      ? `${tvShow.name} · Temporada ${seasonNumber}`
+      : `Temporada ${seasonNumber}`
+  );
 
   useEffect(() => {
     const fetchSeasonAndShow = async () => {
@@ -146,7 +154,7 @@ export default function SeasonDetail() {
         <img
           src={posterUrl}
           alt={tvShow.name}
-          className="w-40 h-56 object-cover rounded-lg shadow-lg"
+          className="w-40 aspect-[2/3] object-cover rounded-lg shadow-lg"
         />
 
         <div className="flex-1 text-center md:text-left">

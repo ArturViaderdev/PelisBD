@@ -26,6 +26,21 @@ public interface UserWatchlistItemRepository extends JpaRepository<UserWatchlist
 
     Page<UserWatchlistItem> findByUser(User user, Pageable pageable);
 
+    /**
+     * Devuelve los items de la lista del usuario cuyo itemId esté en la lista dada.
+     * Se usa para resolver en UNA sola consulta qué elementos de una página
+     * tiene el usuario en "mi lista".
+     */
+    @Query("""
+        SELECT w FROM UserWatchlistItem w
+        WHERE w.user.id = :userId
+          AND w.itemId IN :itemIds
+    """)
+    List<UserWatchlistItem> findByUserIdAndItemIdIn(
+            @Param("userId") Long userId,
+            @Param("itemIds") java.util.Collection<Long> itemIds
+    );
+
     @Query(
             value = """
             SELECT uwi.*

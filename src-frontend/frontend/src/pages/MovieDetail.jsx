@@ -6,6 +6,11 @@ import RatingStars from '../components/RatingStars';
 import CommentSection from '../components/CommentSection';
 import { FiBookmark, FiCheck } from 'react-icons/fi';
 import VideoList from '../components/VideoList';
+import BackButton from '../components/BackButton';
+import { useDocumentTitle } from '../utils/useDocumentTitle';
+import Badge3D from '../components/Badge3D';
+import Movie3DSection from '../components/Movie3DSection';
+import { useMovies3dStore } from '../stores/movies3dStore';
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -17,6 +22,14 @@ export default function MovieDetail() {
   const [isWatchlisted, setIsWatchlisted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(null); // ✅ Nuevo: estado para edición
+  const is3d = useMovies3dStore((s) => s.ids.has(Number(id)));
+
+  // Título de la pestaña: "Título (año) | PelisBD"
+  useDocumentTitle(
+    movie?.title
+      ? `${movie.title}${movie.release_date ? ` (${new Date(movie.release_date).getFullYear()})` : ''}`
+      : null
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -170,6 +183,8 @@ export default function MovieDetail() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <BackButton />
+
       {backdropUrl && (
         <div className="relative rounded-lg overflow-hidden h-96">
           <img
@@ -186,12 +201,20 @@ export default function MovieDetail() {
           <img
             src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
             alt={movie.title}
-            className="w-full rounded-lg shadow-lg"
+            className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg"
           />
         </div>
 
         <div className="md:col-span-3 space-y-4">
-          <h1 className="text-4xl font-bold">{movie.title}</h1>
+          <h1 className="text-4xl font-bold">
+            {movie.title}
+            {movie.release_date && (
+              <span className="ml-3 font-normal text-gray-400">
+                ({new Date(movie.release_date).getFullYear()})
+              </span>
+            )}
+            {is3d && <Badge3D className="ml-3 align-middle text-sm" />}
+          </h1>
 
           <div className="flex gap-4 flex-wrap">
             <button
@@ -216,6 +239,8 @@ export default function MovieDetail() {
               <FiBookmark /> {isWatchlisted ? 'En mi lista' : 'Agregar a mi lista'}
             </button>
           </div>
+
+          <Movie3DSection tmdbId={id} />
 
           <div>
             <p className="text-gray-400 text-sm mb-2">Calificación de TMDB</p>

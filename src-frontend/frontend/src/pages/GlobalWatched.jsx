@@ -2,13 +2,18 @@ import { useEffect, useState } from 'react';
 import { userService } from '../services/api';
 import MovieCard from '../components/MovieCard';
 import FilterBar from '../components/FilterBarGlobal';
+import { useAuthStore } from '../stores/authStore';
+import { useListParams } from '../utils/useListParams';
 
 export default function GlobalWatched() {
+    // Si el usuario inicia/cierra sesión se vuelve a pedir el listado para que
+    // el backend devuelva (o deje de devolver) los flags watched/watchListed.
+    const token = useAuthStore((state) => state.token);
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [page, setPage] = useState(1);
+    // Página y orden en la URL (?page=2&sort=...) para no perderlos al volver del detalle
+    const { page, setPage, sort, setSort } = useListParams({ defaultSort: 'dateadd' });
     const [size] = useState(12);
-    const [sort, setSort] = useState('dateadd');
     const [totalPages, setTotalPages] = useState(1);
     const [totalElements, setTotalElements] = useState(0);
 
@@ -33,18 +38,16 @@ export default function GlobalWatched() {
         };
 
         fetchGlobalWatched();
-    }, [page, size, sort]);
+    }, [page, size, sort, token]);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setPage(newPage);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
     const handleSortChange = (newSort) => {
-        setSort(newSort);
-        setPage(1);
+        setSort(newSort); // vuelve a la página 1
     };
 
     return (

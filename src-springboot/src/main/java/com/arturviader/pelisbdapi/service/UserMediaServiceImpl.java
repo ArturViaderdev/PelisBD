@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -337,17 +339,37 @@ public class UserMediaServiceImpl implements UserMediaService {
             );
         };
 
-        List<WatchedItemDto> itemsdto = watchedPage.getContent().stream()
+        List<GlobalWatchedProjection> pageContent = watchedPage.getContent();
+
+        // Flags del usuario: se calculan en bloque (2 consultas por página).
+        // Si no hay usuario autenticado NO se consulta nada y todo queda a false.
+        Set<String> userWatchedKeys = Collections.emptySet();
+        Set<String> userWatchlistKeys = Collections.emptySet();
+
+        if (user != null && !pageContent.isEmpty()) {
+            Set<Long> itemIds = pageContent.stream()
+                    .map(GlobalWatchedProjection::getItemId)
+                    .collect(Collectors.toSet());
+
+            userWatchedKeys = watchedRepo.findByUserIdAndItemIdIn(user.getId(), itemIds).stream()
+                    .map(w -> mediaKey(w.getType(), w.getItemId()))
+                    .collect(Collectors.toSet());
+
+            userWatchlistKeys = watchlistRepository.findByUserIdAndItemIdIn(user.getId(), itemIds).stream()
+                    .map(w -> mediaKey(w.getType(), w.getItemId()))
+                    .collect(Collectors.toSet());
+        }
+
+        final Set<String> watchedKeys = userWatchedKeys;
+        final Set<String> watchlistKeys = userWatchlistKeys;
+
+        List<WatchedItemDto> itemsdto = pageContent.stream()
                 .map(item -> {
                     MediaType mediaType = MediaType.valueOf(item.getType().trim());
+                    String key = mediaKey(mediaType, item.getItemId());
 
-                    boolean isWatchListed = false;
-                    boolean isWatched = false;
-
-                    if (user != null) {
-                        isWatchListed = isMovieInWatchlist(user.getUserName(), item.getItemId(), mediaType);
-                        isWatched = isMovieWatched(item.getItemId(), user.getUserName(), mediaType);
-                    }
+                    boolean isWatchListed = watchlistKeys.contains(key);
+                    boolean isWatched = watchedKeys.contains(key);
 
                     GlobalWatchedItem globalItem = new GlobalWatchedItem(
                             item.getItemId(),
@@ -368,6 +390,11 @@ public class UserMediaServiceImpl implements UserMediaService {
                 watchedPage.isLast(),
                 watchedPage.isFirst()
         );
+    }
+
+    /** Clave única tipo+id (una película y una serie pueden compartir id de TMDB). */
+    private static String mediaKey(MediaType type, Long itemId) {
+        return type.name() + ":" + itemId;
     }
 
     private void sortGlobalProjectedItems(List<GlobalWatchedItem> items, String sort) {

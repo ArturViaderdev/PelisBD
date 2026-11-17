@@ -7,7 +7,7 @@ import FilterBar from '../components/FilterBar';
 import Pagination from '../components/Pagination';
 
 export default function SearchResultsTV() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const query = (searchParams.get('q') || '').trim();
   const page = parseInt(searchParams.get('page')) || 1;
 
@@ -69,7 +69,8 @@ export default function SearchResultsTV() {
   const handlePageChange = (newPage) => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set('page', newPage);
-    window.history.replaceState(null, '', `?${newSearchParams}`);
+    setSearchParams(newSearchParams);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

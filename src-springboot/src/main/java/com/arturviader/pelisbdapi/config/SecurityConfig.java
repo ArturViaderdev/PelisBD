@@ -73,6 +73,9 @@ public class SecurityConfig {
                                 "/api/search/tv",
                                 "/api/watched",
                                 "/api/watched/**",
+                                "/api/movies3d",
+                                "/api/movies3d/ids",
+                                "/api/movies3d/{tmdbId}/status",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
@@ -95,9 +98,13 @@ public class SecurityConfig {
                                 "/api/reviews/{type}/{itemId}/comments",
                                 "/api/reviews/comments/{commentId}",
                                 "/api/user/tv/{tvId}/episode",
-                                "/api/user/tv/{tvId}/season/{seasonNumber}"
+                                "/api/user/tv/{tvId}/season/{seasonNumber}",
+                                "/api/user/series-in-progress"
                         ).hasRole("USER")
+                        // Proponer película 3D: cualquier usuario logueado (también el admin)
+                        .requestMatchers("/api/user/movies3d/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/admin/comments", "/api/admin/comments/{commentId}").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/movies3d/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

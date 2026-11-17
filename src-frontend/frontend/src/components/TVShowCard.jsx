@@ -104,7 +104,7 @@ export default function TVShowCard({
         className="block"
         aria-label={`Ver detalles de ${name}`}
       >
-        <div className="relative h-60 w-full overflow-hidden">
+        <div className="relative aspect-[2/3] w-full overflow-hidden">
           {poster_path ? (
             <img
               src={`https://image.tmdb.org/t/p/w300${poster_path}`}

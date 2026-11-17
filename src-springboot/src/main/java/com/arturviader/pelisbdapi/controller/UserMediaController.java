@@ -65,6 +65,15 @@ public class UserMediaController {
         }
     }
 
+    /** Para endpoints públicos: devuelve el usuario autenticado o null si es anónimo. */
+    private User getOptionalCurrentUser() {
+        try {
+            return userService.getCurrentUser();
+        } catch (RuntimeException ex) {
+            return null;
+        }
+    }
+
     @GetMapping("/api/user/watchlist")
     @Operation(security = @SecurityRequirement(name = "api_key"))
     public ResponseEntity<WatchListResponse> getWatchlist(@RequestParam(name = "page", defaultValue = "1") int page
@@ -91,7 +100,10 @@ public class UserMediaController {
             @RequestParam(name = "size", defaultValue = "12") int size,
             @RequestParam(name = "sort", defaultValue = "dateadd") String sort)
     {
-        User user = getCurrentUser();
+        // Endpoint público: si hay usuario logueado se devuelven sus flags
+        // (watched / watchListed) en el propio listado; si no, user = null
+        // y el servicio no hace ninguna consulta de usuario.
+        User user = getOptionalCurrentUser();
         WatchedResponse list = mediaService.getGlobalWatchedList(page, size, sort, user);
         return ResponseEntity.ok(list);
     }
@@ -135,5 +147,11 @@ public class UserMediaController {
             @PathVariable Long tvId,
             @PathVariable Integer seasonNumber) {
         return episodeProgressService.getSeasonProgress(tvId, seasonNumber);
+    }
+
+    @GetMapping("/api/user/series-in-progress")
+    @Operation(security = @SecurityRequirement(name = "api_key"))
+    public List<SeriesInProgressDto> getSeriesInProgress() {
+        return episodeProgressService.getSeriesInProgress();
     }
 }
